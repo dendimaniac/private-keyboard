@@ -1,14 +1,16 @@
 package com.example.privatekeyboard;
 
-import androidx.appcompat.app.AppCompatActivity;
-import com.microsoft.signalr.*;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.microsoft.signalr.HubConnection;
+import com.microsoft.signalr.HubConnectionBuilder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,12 +19,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        HubConnection hubConnection = HubConnectionBuilder.create("http://10.0.2.2:7071/api")
+        HubConnection hubConnection = HubConnectionBuilder.create("http://192.168.1.148:7071/api")
                 .build();
 
         hubConnection.on("newMessage", (message) -> {
             Log.d("NewMessage", message);
-            ((TextView)findViewById(R.id.newMessageTextView)).setText(message);
+            runOnUiThread(() -> ((TextView) findViewById(R.id.newMessageTextView)).setText(message));
         }, String.class);
 
         hubConnection.start().blockingAwait();
@@ -44,4 +46,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
