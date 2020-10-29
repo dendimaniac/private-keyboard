@@ -19,13 +19,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        HubConnection hubConnection = HubConnectionBuilder.create("http://192.168.1.148:7071/api")
+        HubConnection hubConnection = HubConnectionBuilder.create("https://privatekeyboard.azurewebsites.net/api")
                 .build();
 
         hubConnection.on("newMessage", (message) -> {
-            Log.d("NewMessage", message);
-            runOnUiThread(() -> ((TextView) findViewById(R.id.newMessageTextView)).setText(message));
-        }, String.class);
+            Log.d("NewMessage", message.text);
+            runOnUiThread(() -> ((TextView) findViewById(R.id.newMessageTextView)).setText(message.text));
+        }, SenderClass.class);
 
         hubConnection.start().blockingAwait();
 
