@@ -1,35 +1,59 @@
 package com.example.privatekeyboard;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.privatekeyboard.Data.ConfirmQRScan;
+import com.example.privatekeyboard.Data.NewMessage;
+import com.google.zxing.WriterException;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
+import java.util.UUID;
+
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
+
 public class MainActivity extends AppCompatActivity {
+    private String connectedUuid;
+    private String newUuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        HubConnection hubConnection = HubConnectionBuilder.create("https://privatekeyboard.azurewebsites.net/api")
-                .build();
+        HubConnection hubConnection = HubConnectionBuilder.create("https://privatekeyboard.azurewebsites.net/api").build();
+        // In development, change the ip to the ip of the machine running the function app
+//        HubConnection hubConnection = HubConnectionBuilder.create("http://192.168.1.149:7071/api").build();
 
         hubConnection.on("newMessage", (message) -> {
             Log.d("NewMessage", message.text);
-            runOnUiThread(() -> ((TextView) findViewById(R.id.newMessageTextView)).setText(message.text));
-        }, SenderClass.class);
+            if (!message.uuid.equals(connectedUuid)) return;
+
+            runOnUiThread(() -> ((EditText) findViewById(R.id.sendMessageTextField)).setText(message.text));
+        }, NewMessage.class);
+
+        hubConnection.on("confirmQRScan", (message) -> {
+            Log.d("ConfirmQRScan", message.uuid);
+            if (!message.uuid.equals(newUuid)) return;
+
+            connectedUuid = message.uuid;
+            SetNewQRBitmap();
+        }, ConfirmQRScan.class);
 
         hubConnection.start().blockingAwait();
 
-        ((EditText)findViewById(R.id.sendMessageTextField)).addTextChangedListener(new TextWatcher() {
+        SetNewQRBitmap();
+
+        ((EditText) findViewById(R.id.sendMessageTextField)).addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -47,4 +71,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void SetNewQRBitmap() {
+        newUuid = UUID.randomUUID().toString();
+        Log.d("NewUUID", newUuid);
+        // In development, change the ip to the the ip of the machine running the function app
+//        QRGEncoder qrgEncoder = new QRGEncoder("http://192.168.1.149:3000/?amount=3&uuid=" + newUuid, null, QRGContents.Type.TEXT, 400);
+        QRGEncoder qrgEncoder = new QRGEncoder("https://lively-stone-01c8fc003.azurestaticapps.net/?amount=3&uuid=" + newUuid, null, QRGContents.Type.TEXT, 400);
+        try {
+            Bitmap bitmap = qrgEncoder.encodeAsBitmap();
+            ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+    }
 }
