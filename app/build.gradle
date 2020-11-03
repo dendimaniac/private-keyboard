@@ -28,6 +28,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation 'androidmads.library.qrgenearator:QRGenearator:1.0.3'
     implementation 'com.microsoft.signalr:signalr:3.0.0'

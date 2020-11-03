@@ -2,6 +2,7 @@ package com.example.privatekeyboard;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -10,13 +11,26 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.privatekeyboard.Data.CipherDecrypt;
 import com.example.privatekeyboard.Data.ConfirmQRScan;
+import com.example.privatekeyboard.Data.InputForm;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.google.zxing.WriterException;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.UUID;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
@@ -24,11 +38,19 @@ import androidmads.library.qrgenearator.QRGEncoder;
 public class MainActivity extends AppCompatActivity {
     private String connectedUuid;
     private String newUuid;
+    private ArrayList<InputForm> formData = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        CipherDecrypt test = new CipherDecrypt("RenMai");
+        try {
+            test.decrypt();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         HubConnection hubConnection = HubConnectionBuilder.create("https://privatekeyboard.azurewebsites.net/api").build();
         // In development, change the ip to the ip of the machine running the function app
