@@ -45,16 +45,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String codeText = "renmai";
-        String codeEncrypted = CipherDecrypt.encrypt(codeText);
-        Log.d("Encrypted",codeEncrypted);
-        Log.d("Decrypted",CipherDecrypt.decrypt(codeEncrypted));
-        CipherDecrypt test = new CipherDecrypt("RenMaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-        try {
-            //test.decrypt();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        CipherDecrypt test = new CipherDecrypt("RenMaiiiiiiiiiiiiiiiiiii");
+        Log.d("EncryptedTestText",test.getText());
+        Log.d("EncryptedTestEncrypt",test.getEncrypted());
+        Log.d("EncryptedTestDecrypt",test.decrypt(test.getEncrypted()));
+
 
         HubConnection hubConnection = HubConnectionBuilder.create("https://privatekeyboard.azurewebsites.net/api").build();
         // In development, change the ip to the ip of the machine running the function app

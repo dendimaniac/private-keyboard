@@ -1,23 +1,26 @@
 package com.example.privatekeyboard.Data;
 
 import org.apache.commons.net.util.Base64;
-import android.util.Log;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PublicKey;
-import java.security.Signature;
+
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CipherDecrypt {
     private String text;
-
-    public CipherDecrypt(String key){
-        this.text=key;
-
+    private String encrypted;
+    public CipherDecrypt(String text){
+        this.text = text;
+        encrypt();
     }
-    public static final byte[] KEY = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'};
+    public String getText(){
+        return this.text;
+    }
+    public String getEncrypted(){
+        return this.encrypted;
+    }
+
+    public static final byte[] KEY = {'P', 'R', 'I', 'V', 'A', 'T', 'E', 'K', 'E', 'Y', 'B', 'O', 'A', 'R', 'D', 'S'};
 
     private static Cipher ecipher;
     private static Cipher dcipher;
@@ -41,18 +44,18 @@ public class CipherDecrypt {
         }
     }
 
-    public static String encrypt(String value) {
-        byte[] b1 = value.getBytes();
+    public void encrypt() {
+        byte[] b1 = text.getBytes();
         byte[] encryptedValue;
         try {
             encryptedValue = ecipher.doFinal(b1);
-            return Base64.encodeBase64String(encryptedValue);
+            this.encrypted = Base64.encodeBase64String(encryptedValue);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    public static String decrypt(String encryptedValue) {
+    public String decrypt(String encryptedValue) {
         byte[] decryptedValue = Base64.decodeBase64(encryptedValue.getBytes());
         byte[] decValue;
         try {
