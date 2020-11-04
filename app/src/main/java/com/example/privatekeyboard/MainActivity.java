@@ -45,9 +45,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        CipherDecrypt test = new CipherDecrypt("RenMai");
+        String codeText = "renmai";
+        String codeEncrypted = CipherDecrypt.encrypt(codeText);
+        Log.d("Encrypted",codeEncrypted);
+        Log.d("Decrypted",CipherDecrypt.decrypt(codeEncrypted));
+        CipherDecrypt test = new CipherDecrypt("RenMaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
         try {
-            test.decrypt();
+            //test.decrypt();
         } catch (Exception e) {
             e.printStackTrace();
         }
