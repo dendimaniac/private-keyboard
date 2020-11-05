@@ -7,8 +7,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class CipherDecrypt {
     private static final Cipher encryptCipher;
-    private String encrypted;
     private static final Cipher decryptCipher;
+
+    public static final byte[] KEY = {'P', 'R', 'I', 'V', 'A', 'T', 'E', 'K', 'E', 'Y', 'B', 'O', 'A', 'R', 'D', 'S'};
 
     static {
         try {
@@ -29,35 +30,18 @@ public class CipherDecrypt {
         }
     }
 
-    private final String text;
-
-    public static final byte[] KEY = {'P', 'R', 'I', 'V', 'A', 'T', 'E', 'K', 'E', 'Y', 'B', 'O', 'A', 'R', 'D', 'S'};
-
-    public CipherDecrypt(String text) {
-        this.text = text;
-        encrypt();
-    }
-
-    public String getText() {
-        return this.text;
-    }
-
-    public String getEncrypted() {
-        return this.encrypted;
-    }
-
-    public void encrypt() {
+    public static String Encrypt(String text) {
         byte[] b1 = text.getBytes();
         byte[] encryptedValue;
         try {
             encryptedValue = encryptCipher.doFinal(b1);
-            this.encrypted = Base64.encodeBase64String(encryptedValue);
+            return Base64.encodeBase64String(encryptedValue);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    public String decrypt(String encryptedValue) {
+    public static String Decrypt(String encryptedValue) {
         byte[] decryptedValue = Base64.decodeBase64(encryptedValue.getBytes());
         byte[] decValue;
         try {
@@ -67,5 +51,4 @@ public class CipherDecrypt {
             throw new IllegalArgumentException(e);
         }
     }
-
 }
