@@ -17,7 +17,7 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "http://192.168.1.149:7071/api";
+    private final String functionUrl = "http://192.168.1.36:7071/api";
     private LinearLayout linearLayout;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
