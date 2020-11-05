@@ -2,6 +2,8 @@ package com.example.privatekeyboard.Data;
 
 import org.apache.commons.net.util.Base64;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -35,7 +37,8 @@ public class CipherDecrypt {
         byte[] encryptedValue;
         try {
             encryptedValue = encryptCipher.doFinal(b1);
-            return Base64.encodeBase64String(encryptedValue);
+            byte[] encodedBytes = Base64.encodeBase64(encryptedValue);
+            return new String(encodedBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
