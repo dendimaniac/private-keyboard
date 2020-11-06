@@ -52,10 +52,11 @@ public class QRUtils {
                 query.append("\"type\":\"tel\",");
             } else if (input.getInputType() == InputType.TYPE_DATETIME_VARIATION_DATE + InputType.TYPE_CLASS_DATETIME) {
                 query.append("\"type\":\"date\",");
+            } else if (input.getInputType() == InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS) {
+                query.append("\"type\":\"email\",");
             }
 
             query.append("\"label\":\"").append(label.getText()).append("\",");
-
             CharSequence hint = input.getHint() == null ? "" : input.getHint();
             query.append("\"placeholder\":\"").append(hint).append("\"");
             query.append("}");

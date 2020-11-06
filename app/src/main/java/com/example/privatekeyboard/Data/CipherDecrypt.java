@@ -22,7 +22,6 @@ public class CipherDecrypt {
             throw new RuntimeException(e);
         }
 
-
         try {
             decryptCipher = Cipher.getInstance("AES");
             SecretKeySpec dSpec = new SecretKeySpec(KEY, "AES");
