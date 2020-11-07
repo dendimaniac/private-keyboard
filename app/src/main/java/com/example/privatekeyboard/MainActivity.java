@@ -20,7 +20,7 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "http://192.168.1.36:7071/api";
+    private final String functionUrl = "http://192.168.1.149:7071/api";
     private LinearLayout linearLayout;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("NewCheckRadio", String.valueOf(message.targetRadioButton));
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
-            RadioGroup radioGroup = (RadioGroup) linearLayout.getChildAt(message.targetRadioGroup);
+            LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
+            RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
         }, NewCheckRadio.class);
 
