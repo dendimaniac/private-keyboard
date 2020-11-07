@@ -7,10 +7,13 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
+import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
@@ -34,9 +37,17 @@ public class MainActivity extends AppCompatActivity {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
-            LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(message.targetInput));
+            LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
+
+        hubConnection.on("newCheckRadio", (message) -> {
+            Log.d("NewCheckRadio", String.valueOf(message.targetRadioButton));
+            if (!message.sender.equals(QRUtils.connectedUuid)) return;
+
+            RadioGroup radioGroup = (RadioGroup) linearLayout.getChildAt(message.targetRadioGroup);
+            runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
+        }, NewCheckRadio.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);

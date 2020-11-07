@@ -10,7 +10,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.example.privatekeyboard.Data.CipherDecrypt;
 import com.google.zxing.WriterException;
 
 import java.util.UUID;
@@ -43,12 +42,14 @@ public class QRUtils {
         StringBuilder query = new StringBuilder("[");
         for (int i = 0; i < layout.getChildCount(); i++) {
             query.append("{");
-            query.append("\"position\":\"").append(i).append("\",");
-            if (layout.getChildAt(i) instanceof RadioGroup) {
-                AddRadioGroupJsonSetting(layout, query, i);
-            } else if (layout.getChildAt(i) instanceof LinearLayout) {
-                AddTextFieldJsonSetting(layout, query, i);
+            LinearLayout fieldLayout = (LinearLayout) layout.getChildAt(i);
+
+            if (fieldLayout.getChildAt(1) instanceof EditText) {
+                AddTextFieldJsonSetting(fieldLayout, query);
+            } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
+                AddRadioGroupJsonSetting(fieldLayout, query);
             }
+
             query.append("}");
 
             if (i < layout.getChildCount() - 1) {
@@ -60,10 +61,9 @@ public class QRUtils {
         return CipherDecrypt.Encrypt(query.toString());
     }
 
-    private static void AddTextFieldJsonSetting(LinearLayout layout, StringBuilder query, int i) {
-        LinearLayout inputFieldItem = (LinearLayout) layout.getChildAt(i);
-        TextView label = (TextView) inputFieldItem.getChildAt(0);
-        EditText input = (EditText) inputFieldItem.getChildAt(1);
+    private static void AddTextFieldJsonSetting(LinearLayout layout, StringBuilder query) {
+        TextView label = (TextView) layout.getChildAt(0);
+        EditText input = (EditText) layout.getChildAt(1);
 
         if (input.getInputType() == InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PERSON_NAME) {
             query.append("\"type\":\"text\",");
@@ -80,8 +80,11 @@ public class QRUtils {
         query.append("\"placeholder\":\"").append(hint).append("\"");
     }
 
-    private static void AddRadioGroupJsonSetting(LinearLayout layout, StringBuilder query, int i) {
-        RadioGroup radioGroup = (RadioGroup) layout.getChildAt(i);
+    private static void AddRadioGroupJsonSetting(LinearLayout layout, StringBuilder query) {
+        RadioGroup radioGroup = (RadioGroup) layout.getChildAt(1);
+        TextView mainLabel = (TextView) layout.getChildAt(0);
+        query.append("\"label\":\"").append(mainLabel.getText()).append("\",");
+        query.append("\"type\":\"radio\",");
         query.append("\"group\":\"").append(radioGroup.getTag().toString()).append("\",");
         query.append("\"radioButtons\":[");
 
@@ -89,7 +92,7 @@ public class QRUtils {
             RadioButton button = (RadioButton) radioGroup.getChildAt(j);
             query.append("{");
             query.append("\"label\":\"").append(button.getText()).append("\",");
-            query.append("\"isChecked\":\"").append(button.isChecked()).append("\"");
+            query.append("\"isChecked\":").append(button.isChecked());
             query.append("}");
 
             if (j < radioGroup.getChildCount() - 1) {
