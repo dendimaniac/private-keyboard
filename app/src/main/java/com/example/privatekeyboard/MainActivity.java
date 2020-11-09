@@ -43,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         linearLayout = (LinearLayout) findViewById(R.id.input_layout);
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
-        // Init folder chứa local files
+        // Init folder chứa local files để test convert từ ảnh qua string
+        // Lấy ảnh trong storage hoặc chỗ khác thì phải xin permission. Thêm rắc rối. Dù sao cũng lấy string từ web app rồi thả vào storage.
+        // Client có nhu cầu save thì chờ lấy code base bên kia rồi edit sau.
         try {
             FileOutputStream fos = openFileOutput("hi",0);
             fos.close();
