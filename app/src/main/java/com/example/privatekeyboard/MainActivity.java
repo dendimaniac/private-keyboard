@@ -1,5 +1,8 @@
 package com.example.privatekeyboard;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,28 +13,56 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
+import com.example.privatekeyboard.Helpers.ConvertImage;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "http://192.168.1.149:7071/api";
+    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("SdCardPath")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         linearLayout = (LinearLayout) findViewById(R.id.input_layout);
-
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
+        // Init folder chứa local files
+        try {
+            FileOutputStream fos = openFileOutput("hi",0);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // View -> Tool Windows -> Device Manager search private keyboard, upload 1 ảnh random vào folder files để test
+        String chaulenba = ConvertImage.convertImageToString("/data/data/com.example.privatekeyboard/files/48423700_389535721816795_8993131097952878592_n.jpg");
+        Log.d("ConvertedImage",chaulenba);
+        //ConvertImage.convertStringToImageByteArray(a);
+        try {
+            ConvertImage.convertStringToImageByteArray(chaulenba);
+            Log.d("ConvertedString","ggez");
+        }catch (Exception e){
+            Log.d("ErrorImg", String.valueOf(e));
+        }
+
+
+
 
         hubConnection.on("newMessage", (message) -> {
             Log.d("NewMessage", message.text);
