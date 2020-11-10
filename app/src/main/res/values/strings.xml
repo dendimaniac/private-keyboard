@@ -4,7 +4,11 @@
     <string name="last_name">Last name</string>
     <string name="phone_number">Phone number</string>
     <string name="email_address">Email Address</string>
-    <string name="qr_code">QR code</string>
+    <string name="gender">Gender</string>
     <string name="radio_male">Male</string>
     <string name="radio_female">Female</string>
+    <string name="qr_code">QR code</string>
+    <string name="tilt_adjustment">Tilt adjustment</string>
+    <string name="angle">Angle: 0</string>
+    <string name="take_picture">TAKE PICTURE</string>
 </resources>

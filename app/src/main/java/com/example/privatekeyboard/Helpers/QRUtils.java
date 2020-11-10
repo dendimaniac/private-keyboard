@@ -20,7 +20,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 public class QRUtils {
     public static String connectedUuid;
     public static String newUuid;
-    private static final String baseWebAppUrl = "http://192.168.1.149:3000/";
+    private static final String baseWebAppUrl = "http://192.168.1.39:3000/";
     // Deployment web app URL: https://lively-stone-01c8fc003.azurestaticapps.net/
     // Development web app URL (example): http://192.168.1.149:3000/
 
