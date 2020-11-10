@@ -2,16 +2,20 @@ package com.example.privatekeyboard;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +45,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button bt = findViewById(R.id.buttonCam);
+        bt.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                startActivity(intent);
+            }
+
+        });
+
         linearLayout = (LinearLayout) findViewById(R.id.input_layout);
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
         // Init folder chứa local files để test convert từ ảnh qua string
@@ -53,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         // View -> Tool Windows -> Device Manager search private keyboard, upload 1 ảnh random vào folder files để test
-        String chaulenba = ConvertImage.convertImageToString("/data/data/com.example.privatekeyboard/files/48423700_389535721816795_8993131097952878592_n.jpg");
+        String chaulenba = ConvertImage.convertImageToString("/data/data/com.example.privatekeyboard/files/upload.html");
         Log.d("ConvertedImage",chaulenba);
         //ConvertImage.convertStringToImageByteArray(a);
         try {
@@ -111,5 +125,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
+
+
 }
