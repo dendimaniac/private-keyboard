@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,7 +21,7 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "http://192.168.1.39:7071/api";
+    private final String functionUrl = "http://192.168.1.81:7071/api";
     private LinearLayout linearLayout;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
@@ -29,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         linearLayout = (LinearLayout) findViewById(R.id.input_layout);
+        ImageView qrImage=(ImageView) findViewById(R.id.qrImage);
 
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
@@ -53,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);
             if (!message.uuid.equals(QRUtils.newUuid)) return;
-
+            // hide the QR view after connecting successfully
+            qrImage.setVisibility(View.INVISIBLE);
             QRUtils.connectedUuid = message.uuid;
             QRUtils.SetNewQRBitmap((ImageView) findViewById(R.id.qrImage), linearLayout);
         }, ConfirmQRScan.class);
