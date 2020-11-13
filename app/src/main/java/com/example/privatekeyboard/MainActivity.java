@@ -21,7 +21,7 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "http://192.168.1.81:7071/api";
+    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        linearLayout = (LinearLayout) findViewById(R.id.input_layout);
-        ImageView qrImage=(ImageView) findViewById(R.id.qrImage);
+        linearLayout = findViewById(R.id.input_layout);
+        ImageView qrImage = findViewById(R.id.qrImage);
 
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
@@ -59,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
             // hide the QR view after connecting successfully
             qrImage.setVisibility(View.INVISIBLE);
             QRUtils.connectedUuid = message.uuid;
-            QRUtils.SetNewQRBitmap((ImageView) findViewById(R.id.qrImage), linearLayout);
+            QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         }, ConfirmQRScan.class);
 
         hubConnection.start().blockingAwait();
 
-        QRUtils.SetNewQRBitmap((ImageView) findViewById(R.id.qrImage), linearLayout);
+        QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
 
         ((EditText) findViewById(R.id.sendMessageTextField)).addTextChangedListener(new TextWatcher() {
             @Override
