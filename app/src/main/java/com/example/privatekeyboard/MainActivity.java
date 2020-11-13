@@ -1,22 +1,31 @@
 package com.example.privatekeyboard;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,10 +41,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
+    private static final int PERMISSION_CODE = 1000;
+    ImageButton bt;
+    Uri imageUri;
+    private int IMAGE_CAPTURE_CODE = 1001;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
 
@@ -45,12 +59,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button bt = findViewById(R.id.buttonCam);
+        bt = findViewById(R.id.imageButton);
         bt.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                startActivity(intent);
+                startCamera();
             }
 
         });
@@ -127,6 +140,38 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void startCamera() {
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
+        imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra("android.intent.extra.quickCapture",true);
+
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE);
+
+    }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case PERMISSION_CODE:{
+                if (grantResults.length > 0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    startCamera();
+                } else {
+                    Toast.makeText(this, "Permissiondenied...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            bt.setImageURI(imageUri);
+        }
+    }
+
 
 
 }
