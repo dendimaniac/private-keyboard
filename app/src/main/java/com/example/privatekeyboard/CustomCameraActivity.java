@@ -2,8 +2,13 @@ package com.example.privatekeyboard;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -17,9 +22,9 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -31,10 +36,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,9 +51,11 @@ public class CustomCameraActivity extends AppCompatActivity {
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        ORIENTATIONS.append(Surface.ROTATION_0, -90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
@@ -63,13 +70,13 @@ public class CustomCameraActivity extends AppCompatActivity {
     private Size imageDimension;
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
-            openCamera();
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            openCamera(width, height);
         }
 
         @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
-
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+            configureTransform(width, height);
         }
 
         @Override
@@ -135,55 +142,61 @@ public class CustomCameraActivity extends AppCompatActivity {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
             }
-            final ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+            ImageReader imageReader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 2);
             List<Surface> outputSurface = new ArrayList<>(2);
-            outputSurface.add(reader.getSurface());
+            outputSurface.add(imageReader.getSurface());
             outputSurface.add(new Surface(textureView.getSurfaceTexture()));
 
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
+            captureBuilder.addTarget(imageReader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
             //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
-            file = new File(Environment.getExternalStorageDirectory() + "/" + UUID.randomUUID().toString() + ".jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
-                    Image image = null;
-                    try {
-                        image = reader.acquireLatestImage();
+                    try (Image image = imageReader.acquireLatestImage()) {
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        save(bytes);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        {
-                            if (image != null)
-                                image.close();
-                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                        Bitmap rotatedBitmap = rotateImageToUpright(bitmap);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        createFile(byteArray);
+                        Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
+                        intent.putExtra("image_path", file.getPath());
+                        startActivity(intent);
                     }
                 }
 
-                private void save(byte[] bytes) throws IOException {
-                    try (OutputStream outputStream = new FileOutputStream(file)) {
-                        outputStream.write(bytes);
+                private void createFile(byte[] fileData) {
+                    try {
+                        File path = new File(getApplicationContext().getFilesDir(), "Images");
+                        if (!path.exists()) {
+                            path.mkdirs();
+                        }
+                        file = new File(path, UUID.randomUUID().toString() + ".jpg");
+                        Log.d("CREATED_FILE", "createFile: " + file.getPath());
+                        FileOutputStream out = new FileOutputStream(file);
+                        out.write(fileData);
+                        out.close();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             };
 
-            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+            imageReader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
             final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CustomCameraActivity.this, "Saved " + file, Toast.LENGTH_SHORT).show();
-                    createCameraPreview();
                 }
             };
 
@@ -247,27 +260,61 @@ public class CustomCameraActivity extends AppCompatActivity {
         }
     }
 
-    private void openCamera() {
+    private void openCamera(int width, int height) {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
-            cameraId = manager.getCameraIdList()[0];
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            assert map != null;
-            imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
-            //Check realtime permission if run higher API 23
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, REQUEST_CAMERA_PERMISSION);
-                return;
-            }
-            manager.openCamera(cameraId, stateCallback, null);
+            String[] cameraIdList = manager.getCameraIdList();
+            for (String testCameraId : cameraIdList) {
+                CameraCharacteristics characteristics = manager.getCameraCharacteristics(testCameraId);
 
+                // We don't use a front facing camera in this sample.
+                Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+                    continue;
+                }
+
+                cameraId = testCameraId;
+                StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                assert map != null;
+                imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
+                //Check realtime permission if run higher API 23
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    }, REQUEST_CAMERA_PERMISSION);
+                    return;
+                }
+                configureTransform(width, height);
+                manager.openCamera(cameraId, stateCallback, null);
+            }
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private void configureTransform(int viewWidth, int viewHeight) {
+        if (null == textureView || null == imageDimension) {
+            return;
+        }
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        RectF bufferRect = new RectF(0, 0, imageDimension.getHeight(), imageDimension.getWidth());
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+            float scale = Math.max(
+                    (float) viewHeight / imageDimension.getHeight(),
+                    (float) viewWidth / imageDimension.getWidth());
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180, centerX, centerY);
+        }
+        textureView.setTransform(matrix);
     }
 
     @Override
@@ -286,7 +333,7 @@ public class CustomCameraActivity extends AppCompatActivity {
         super.onResume();
         startBackgroundThread();
         if (textureView.isAvailable())
-            openCamera();
+            openCamera(textureView.getWidth(), textureView.getHeight());
         else
             textureView.setSurfaceTextureListener(textureListener);
     }
@@ -312,5 +359,15 @@ public class CustomCameraActivity extends AppCompatActivity {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    private Bitmap rotateImageToUpright(Bitmap source) {
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        float angle = ORIENTATIONS.get(rotation);
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        matrix.postScale(-1, 1, source.getWidth() / 2f, source.getHeight() / 2f);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 }

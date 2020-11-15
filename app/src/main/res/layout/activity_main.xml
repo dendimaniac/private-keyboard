@@ -150,6 +150,16 @@
     </ScrollView>
 
     <ImageView
+        android:id="@+id/takenImage"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/qrImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
         android:id="@+id/qrImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -166,6 +176,7 @@
         android:layout_height="wrap_content"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
