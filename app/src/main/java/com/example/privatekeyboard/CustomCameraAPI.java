@@ -253,7 +253,6 @@ public class CustomCameraAPI extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
     private void updatePreview() {
         if(cameraDevice == null)
             Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
@@ -264,7 +263,6 @@ public class CustomCameraAPI extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
     private void openCamera() {
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);

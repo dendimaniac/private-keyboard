@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
 //            Log.d("ErrorImg", String.valueOf(e));
 //        }
 
-
-
         CustomCameraAPI camVab = new CustomCameraAPI();
         hubConnection.on("newMessage", (message) -> {
             Log.d("NewMessage", message.text);
