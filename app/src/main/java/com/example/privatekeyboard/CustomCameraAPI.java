@@ -127,11 +127,13 @@ public class CustomCameraAPI extends AppCompatActivity {
 
 
 
+
     public void takePicture() {
         if(cameraDevice == null)
             return;
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
+
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
             if(characteristics != null)
@@ -151,13 +153,19 @@ public class CustomCameraAPI extends AppCompatActivity {
             outputSurface.add(reader.getSurface());
             outputSurface.add(new Surface(textureView.getSurfaceTexture()));
 
+
+
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
             //Check orientation base on device
+//            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+//            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
+            int mSensorOrientation  = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
+
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360);
             File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera");
             if (!folder.mkdirs()) {
                 folder.mkdirs();

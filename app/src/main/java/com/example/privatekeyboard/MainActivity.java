@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 if(file.exists()){
 
                     Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                    bt.setRotation(90);
+                    bt.setRotation(270);
                     bt.setImageBitmap(bitmap);
                 }
 
