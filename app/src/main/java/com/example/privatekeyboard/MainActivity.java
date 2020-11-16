@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.privatekeyboard.Data.ConfirmQRScan;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
+import com.example.privatekeyboard.Data.TiltAngle;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         linearLayout = findViewById(R.id.input_layout);
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
-        hubConnection.on("newMessage", (message) -> {
+        hubConnection.on("sendInputField", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
 
-        hubConnection.on("newCheckRadio", (message) -> {
+        hubConnection.on("selectRadioGroup", (message) -> {
             Log.d("NewCheckRadio", String.valueOf(message.targetRadioButton));
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
@@ -104,6 +105,12 @@ public class MainActivity extends AppCompatActivity {
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
         }, NewCheckRadio.class);
+
+        hubConnection.on("updateTiltAngle", (message) -> {
+            if (!message.sender.equals(QRUtils.connectedUuid)) return;
+
+            Log.d("TiltAngle", String.valueOf(message.value));
+        }, TiltAngle.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);
