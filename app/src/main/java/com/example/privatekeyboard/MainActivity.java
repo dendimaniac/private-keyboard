@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -36,7 +38,8 @@ import com.example.privatekeyboard.Helpers.ConvertImage;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -46,12 +49,13 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
     private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
-    private static final int PERMISSION_CODE = 1000;
+    private static final int REQUEST_CODE = 1000;
     ImageButton bt;
     Uri imageUri;
     private int IMAGE_CAPTURE_CODE = 1001;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
+//    private final ActivityResultLauncher<Void> takePicturePreview = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(result));
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SdCardPath")
@@ -59,12 +63,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Intent camera = new Intent(MainActivity.this, CustomCameraAPI.class);
         bt = findViewById(R.id.imageButton);
         bt.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                startActivity(camera);
+                startActivityForResult(camera,REQUEST_CODE);
             }
 
         });
@@ -81,23 +86,22 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         // View -> Tool Windows -> Device Manager search private keyboard, upload 1 ảnh random vào folder files để test
-        String chaulenba = ConvertImage.convertImageToString("/data/data/com.example.privatekeyboard/files/upload.html");
-        Log.d("ConvertedImage",chaulenba);
-        //ConvertImage.convertStringToImageByteArray(a);
-        try {
-            ConvertImage.convertStringToImageByteArray(chaulenba);
-            Log.d("ConvertedString","ggez");
-        }catch (Exception e){
-            Log.d("ErrorImg", String.valueOf(e));
-        }
+//        String chaulenba = ConvertImage.convertImageToString("/data/data/com.example.privatekeyboard/files/upload.html");
+//        Log.d("ConvertedImage",chaulenba);
+//        //ConvertImage.convertStringToImageByteArray(a);
+//        try {
+//            ConvertImage.convertStringToImageByteArray(chaulenba);
+//            Log.d("ConvertedString","ggez");
+//        }catch (Exception e){
+//            Log.d("ErrorImg", String.valueOf(e));
+//        }
 
 
 
-
+        CustomCameraAPI camVab = new CustomCameraAPI();
         hubConnection.on("newMessage", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
@@ -140,6 +144,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                Log.d("ImageLink",result);
+                File file = new  File(result);
+                if(file.exists()){
+
+                    Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    bt.setRotation(90);
+                    bt.setImageBitmap(bitmap);
+                }
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
     }
 
 

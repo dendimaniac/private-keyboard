@@ -2,6 +2,8 @@ package com.example.privatekeyboard;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -26,23 +28,35 @@ import android.media.ImageReader;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.hardware.camera2.*;
 
+import com.example.privatekeyboard.Data.NewMessage;
+import com.example.privatekeyboard.Helpers.QRUtils;
+import com.microsoft.signalr.HubConnection;
+import com.microsoft.signalr.HubConnectionBuilder;
+
 public class CustomCameraAPI extends AppCompatActivity {
+    Intent returnIntent = new Intent();
+
+    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+
+    HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera_a_p_i);
         textureView = (TextureView)findViewById(R.id.textureView);
-        //From Java 1.4 , you can use keyword 'assert' to check expression true or false
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
         btnCapture = (Button)findViewById(R.id.btnCapture);
@@ -52,15 +66,27 @@ public class CustomCameraAPI extends AppCompatActivity {
                 takePicture();
             }
         });
+        hubConnection.on("newMessage", (message) -> {
+            Log.d("NewMessageInCamera", message.text);
+            if (message.text.equals("capture")){
+                Log.d("camera","taken");
+
+                hubConnection.stop();
+                takePicture();
+            }
+        }, NewMessage.class);
+        hubConnection.start().blockingAwait();
+
     }
+
     private Button btnCapture;
     private TextureView textureView;
 
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
-        ORIENTATIONS.append(Surface.ROTATION_0,90);
         ORIENTATIONS.append(Surface.ROTATION_90,0);
+        ORIENTATIONS.append(Surface.ROTATION_0,90);
         ORIENTATIONS.append(Surface.ROTATION_180,270);
         ORIENTATIONS.append(Surface.ROTATION_270,180);
     }
@@ -101,7 +127,7 @@ public class CustomCameraAPI extends AppCompatActivity {
 
 
 
-    private void takePicture() {
+    public void takePicture() {
         if(cameraDevice == null)
             return;
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
@@ -132,8 +158,12 @@ public class CustomCameraAPI extends AppCompatActivity {
             //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
+            File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera");
+            if (!folder.mkdirs()) {
+                folder.mkdirs();
+            }
 
-            file = new File(Environment.getExternalStorageDirectory()+"/"+ UUID.randomUUID().toString()+".jpg");
+            file = new File(Environment.getExternalStorageDirectory()+"/DCIM/Camera/"+ UUID.randomUUID().toString()+".jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
@@ -145,16 +175,10 @@ public class CustomCameraAPI extends AppCompatActivity {
                         buffer.get(bytes);
                         save(bytes);
 
-                    }
-                    catch (FileNotFoundException e)
+                    } catch (IOException e)
                     {
                         e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    finally {
+                    } finally {
                         {
                             if(image != null)
                                 image.close();
@@ -162,13 +186,8 @@ public class CustomCameraAPI extends AppCompatActivity {
                     }
                 }
                 private void save(byte[] bytes) throws IOException {
-                    OutputStream outputStream = null;
-                    try{
-                        outputStream = new FileOutputStream(file);
+                    try (OutputStream outputStream = new FileOutputStream(file)) {
                         outputStream.write(bytes);
-                    }finally {
-                        if(outputStream != null)
-                            outputStream.close();
                     }
                 }
             };
@@ -180,6 +199,9 @@ public class CustomCameraAPI extends AppCompatActivity {
                     super.onCaptureCompleted(session, request, result);
                     Toast.makeText(CustomCameraAPI.this, "Saved "+file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
+                    returnIntent.putExtra("result",file.toString());
+                    setResult(Activity.RESULT_OK,returnIntent);
+                    finish();
                 }
             };
 
@@ -247,7 +269,7 @@ public class CustomCameraAPI extends AppCompatActivity {
     private void openCamera() {
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
-            cameraId = manager.getCameraIdList()[0];
+            cameraId = manager.getCameraIdList()[1];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
@@ -292,10 +314,9 @@ public class CustomCameraAPI extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == REQUEST_CAMERA_PERMISSION)
-        {
-            if(grantResults[0] != PackageManager.PERMISSION_GRANTED)
-            {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "You can't use camera without permission", Toast.LENGTH_SHORT).show();
                 finish();
             }
