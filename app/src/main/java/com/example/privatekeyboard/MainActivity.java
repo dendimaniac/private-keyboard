@@ -47,7 +47,7 @@ import java.io.IOException;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+    private final String functionUrl = "http://192.168.0.104:7071/api";
     private LinearLayout linearLayout;
     private static final int REQUEST_CODE = 1000;
     ImageButton bt;
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 if(file.exists()){
 
                     Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                    bt.setRotation(270);
+                    //bt.setRotation(90);
                     bt.setImageBitmap(bitmap);
                 }
 
