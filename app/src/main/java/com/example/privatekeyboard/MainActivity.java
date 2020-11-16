@@ -59,11 +59,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent camera = new Intent(MainActivity.this, CustomCameraAPI.class);
         bt = findViewById(R.id.imageButton);
         bt.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                startCamera();
+                startActivity(camera);
             }
 
         });
@@ -139,37 +140,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-    private void startCamera() {
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "New Picture");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
-        imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra("android.intent.extra.quickCapture",true);
-
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE);
-
-    }
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case PERMISSION_CODE:{
-                if (grantResults.length > 0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                    startCamera();
-                } else {
-                    Toast.makeText(this, "Permissiondenied...", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            bt.setImageURI(imageUri);
-        }
     }
 
 
