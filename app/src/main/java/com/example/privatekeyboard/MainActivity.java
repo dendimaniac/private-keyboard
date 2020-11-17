@@ -1,5 +1,12 @@
 package com.example.privatekeyboard;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -13,6 +20,7 @@ import android.view.Surface;
 import android.widget.Button;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -28,6 +36,7 @@ import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Data.TiltAngle;
 import com.example.privatekeyboard.Helpers.QRUtils;
+import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.example.privatekeyboard.Data.TiltAngle;
@@ -52,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
+    // private final ActivityResultLauncher<Void> takePicturePreview = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(result));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("sendInputField", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
@@ -134,6 +143,19 @@ public class MainActivity extends AppCompatActivity {
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
     }
 
+    private void sendEmail() {
+        //Getting content for email
+        String email = editTextEmail.getText().toString().trim();
+        String subject = "Personal Information";
+        String message = "Hiiiiiiiiiiiii";
+
+        //Creating SendMail object
+        SendMail sm = new SendMail(this, email, subject, message);
+
+        //Executing sendmail to send email
+        sm.execute();
+    }
+  
     private void rotateImageToUpright(Bitmap source) {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         float angle = ORIENTATIONS.get(rotation);

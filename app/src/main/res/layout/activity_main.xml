@@ -9,6 +9,7 @@
     tools:context=".MainActivity">
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -117,7 +118,7 @@
                     android:text="@string/email_address" />
 
                 <EditText
-                    android:id="@+id/editTextTextPersonName4"
+                    android:id="@+id/editTextEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -157,6 +158,7 @@
                         android:text="@string/radio_female" />
 
                 </RadioGroup>
+
             </LinearLayout>
 
             <LinearLayout
@@ -200,7 +202,6 @@
 
         </LinearLayout>
     </ScrollView>
-
     <ImageView
         android:id="@+id/takenImage"
         android:layout_width="128dp"
@@ -221,9 +222,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/qrImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/hiiii"
+        android:scaleType="fitXY"/>
 
     <Button
-        android:id="@+id/buttonCam"
+        android:id="@+id/sendEmailButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Button"
