@@ -30,7 +30,6 @@ import com.example.privatekeyboard.Helpers.QRUtils;
 import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private static final int REQUEST_CODE = 1000;
     private EditText editTextEmail;
+
+    //asdasdf
 
     ImageButton takePicButton;
     Button sendEmail;
