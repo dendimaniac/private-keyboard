@@ -2,18 +2,12 @@ package com.example.privatekeyboard;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,32 +19,30 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
-import com.example.privatekeyboard.Helpers.ConvertImage;
 import com.example.privatekeyboard.Helpers.QRUtils;
+import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private final String functionUrl = "http://192.168.0.104:7071/api";
     private LinearLayout linearLayout;
     private static final int REQUEST_CODE = 1000;
-    ImageButton bt;
+    private EditText editTextEmail;
+
+    ImageButton takePicButton;
+    Button sendEmail;
     Uri imageUri;
     private int IMAGE_CAPTURE_CODE = 1001;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
@@ -63,15 +55,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         Intent camera = new Intent(MainActivity.this, CustomCameraAPI.class);
-        bt = findViewById(R.id.imageButton);
-        bt.setOnClickListener(new View.OnClickListener(){
+        takePicButton = findViewById(R.id.imageButton);
+        takePicButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // TODO Auto-generated method stub
                 startActivityForResult(camera,REQUEST_CODE);
             }
 
+        });
+        sendEmail = findViewById(R.id.sendEmailButton);
+
+
+        sendEmail.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                sendEmail();
+            }
         });
 
         linearLayout = (LinearLayout) findViewById(R.id.input_layout);
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
                     //bt.setRotation(90);
-                    bt.setImageBitmap(bitmap);
+                    takePicButton.setImageBitmap(bitmap);
                 }
 
             }
@@ -164,6 +165,18 @@ public class MainActivity extends AppCompatActivity {
                 //Write your code if there's no result
             }
         }
+    }
+    private void sendEmail() {
+        //Getting content for email
+        String email = editTextEmail.getText().toString().trim();
+        String subject = "Personal Information";
+        String message = "Hiiiiiiiiiiiii";
+
+        //Creating SendMail object
+        SendMail sm = new SendMail(this, email, subject, message);
+
+        //Executing sendmail to send email
+        sm.execute();
     }
 
 
