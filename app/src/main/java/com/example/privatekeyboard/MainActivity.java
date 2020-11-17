@@ -1,30 +1,55 @@
 package com.example.privatekeyboard;
 
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseIntArray;
+import android.view.Surface;
+import android.widget.Button;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
+import com.example.privatekeyboard.Data.TiltAngle;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.example.privatekeyboard.Data.TiltAngle;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, -90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
+
     private final String functionUrl = "http://192.168.1.94:7071/api";
     private LinearLayout linearLayout;
+    private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
 
@@ -36,6 +61,38 @@ public class MainActivity extends AppCompatActivity {
         linearLayout = findViewById(R.id.input_layout);
         ImageView qrImage = findViewById(R.id.qrImage);
 
+        profileImageView = findViewById(R.id.takenImage);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            try {
+                String savedImagePath = bundle.getString("image_path");
+
+                File file = new File(savedImagePath);
+                int size = (int) file.length();
+                byte[] bytes = new byte[size];
+                try {
+                    BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+                    buf.read(bytes, 0, bytes.length);
+                    buf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                profileImageView.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Button openCustomCameraButton = findViewById(R.id.buttonCam);
+
+        openCustomCameraButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
+            startActivity(intent);
+        });
+
+        linearLayout = findViewById(R.id.input_layout);
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -57,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
+          
             Log.d("TiltAngle", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
             tiltTextView.setText("Angle:" + String.valueOf(message.value));
@@ -74,22 +132,24 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.start().blockingAwait();
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
+    }
 
-        ((EditText) findViewById(R.id.sendMessageTextField)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    private void rotateImageToUpright(Bitmap source) {
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        float angle = ORIENTATIONS.get(rotation);
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Log.d("TextChanged", hubConnection.getConnectionState().toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(MainActivity.this, "Landscape Mode", Toast.LENGTH_LONG).show();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Toast.makeText(MainActivity.this, "Portrait Mode", Toast.LENGTH_LONG).show();
+        }
+        rotateImageToUpright(((BitmapDrawable) profileImageView.getDrawable()).getBitmap());
     }
 }
