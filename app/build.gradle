@@ -33,6 +33,8 @@ dependencies {
     implementation "androidx.activity:activity:1.2.0-beta01"
     implementation "androidx.fragment:fragment:1.3.0-beta01"
     implementation "commons-net:commons-net:3.0.1"
+    implementation 'androidx.activity:activity:1.2.0-beta01'
+    implementation 'androidx.fragment:fragment:1.3.0-beta01'
     implementation 'androidmads.library.qrgenearator:QRGenearator:1.0.3'
     implementation 'com.microsoft.signalr:signalr:3.0.0'
     implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.7'
