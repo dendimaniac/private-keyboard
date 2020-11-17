@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        linearLayout = (LinearLayout) findViewById(R.id.input_layout);
-        ImageView qrImage=(ImageView) findViewById(R.id.qrImage);
+        linearLayout = findViewById(R.id.input_layout);
+        ImageView qrImage = findViewById(R.id.qrImage);
 
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
@@ -68,12 +68,12 @@ public class MainActivity extends AppCompatActivity {
             // hide the QR view after connecting successfully
             qrImage.setVisibility(View.INVISIBLE);
             QRUtils.connectedUuid = message.uuid;
-            QRUtils.SetNewQRBitmap((ImageView) findViewById(R.id.qrImage), linearLayout);
+            QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         }, ConfirmQRScan.class);
 
         hubConnection.start().blockingAwait();
 
-        QRUtils.SetNewQRBitmap((ImageView) findViewById(R.id.qrImage), linearLayout);
+        QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
 
         ((EditText) findViewById(R.id.sendMessageTextField)).addTextChangedListener(new TextWatcher() {
             @Override
