@@ -11,12 +11,14 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +30,7 @@ import com.example.privatekeyboard.Data.TiltAngle;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
+import com.example.privatekeyboard.Data.TiltAngle;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private final String functionUrl = "http://192.168.1.149:7071/api";
+    private final String functionUrl = "http://192.168.1.94:7071/api";
     private LinearLayout linearLayout;
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
@@ -54,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        linearLayout = findViewById(R.id.input_layout);
+        ImageView qrImage = findViewById(R.id.qrImage);
 
         profileImageView = findViewById(R.id.takenImage);
         Bundle bundle = getIntent().getExtras();
@@ -108,14 +114,17 @@ public class MainActivity extends AppCompatActivity {
 
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
+          
             Log.d("TiltAngle", String.valueOf(message.value));
+            TextView tiltTextView = findViewById(R.id.tiltValue);
+            tiltTextView.setText("Angle:" + String.valueOf(message.value));
         }, TiltAngle.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);
             if (!message.uuid.equals(QRUtils.newUuid)) return;
-
+            // hide the QR view after connecting successfully
+            qrImage.setVisibility(View.INVISIBLE);
             QRUtils.connectedUuid = message.uuid;
             QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         }, ConfirmQRScan.class);

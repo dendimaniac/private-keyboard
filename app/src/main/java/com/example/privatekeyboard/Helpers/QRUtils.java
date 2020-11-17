@@ -20,7 +20,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 public class QRUtils {
     public static String connectedUuid;
     public static String newUuid;
-    private static final String baseWebAppUrl = "http://192.168.1.149:3000/";
+    private static final String baseWebAppUrl = "http://192.168.1.94:3000/";
     // Deployment web app URL: https://lively-stone-01c8fc003.azurestaticapps.net/
     // Development web app URL (example): http://192.168.1.149:3000/
 
@@ -29,7 +29,7 @@ public class QRUtils {
         Log.d("NewUUID", newUuid);
         String settings = GenerateQRQuery(formLinearLayout);
         Log.d("InputSettings", settings);
-        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 200);
+        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 800);
         try {
             Bitmap bitmap = qrgEncoder.encodeAsBitmap();
             qrImage.setImageBitmap(bitmap);
