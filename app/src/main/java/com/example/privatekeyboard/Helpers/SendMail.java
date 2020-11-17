@@ -17,22 +17,22 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class SendMail extends AsyncTask<Void,Void,Void> {
+public class SendMail extends AsyncTask<Void, Void, Void> {
 
     //Declaring Variables
-    private Context context;
+    private final Context context;
     private Session session;
 
     //Information to send email
-    private String email;
-    private String subject;
-    private String message;
+    private final String email;
+    private final String subject;
+    private final String message;
 
-    //Progressdialog to show while sending email
+    //Progress dialog to show while sending email
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String message){
+    public SendMail(Context context, String email, String subject, String message) {
         //Initializing variables
         this.context = context;
         this.email = email;
@@ -44,7 +44,7 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
     protected void onPreExecute() {
         super.onPreExecute();
         //Showing progress dialog while sending email
-        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
+        progressDialog = ProgressDialog.show(context, "Sending message", "Please wait...", false, false);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         //Dismissing the progress dialog
         progressDialog.dismiss();
         //Showing a success message
-        Toast.makeText(context,"Message Sent",Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Message Sent", Toast.LENGTH_LONG).show();
     }
 
     @Override
