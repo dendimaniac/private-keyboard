@@ -1,4 +1,4 @@
-package com.example.privatekeyboard.Data;
+package com.example.privatekeyboard.Helpers;
 
 import org.apache.commons.net.util.Base64;
 
@@ -21,7 +21,6 @@ public class CipherDecrypt {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
 
         try {
             decryptCipher = Cipher.getInstance("AES");
