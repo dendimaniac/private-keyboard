@@ -30,6 +30,7 @@ import com.example.privatekeyboard.Helpers.QRUtils;
 import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,16 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private static final int REQUEST_CODE = 1000;
     private EditText editTextEmail;
-
-    //asdasdf
-
     ImageButton takePicButton;
     Button sendEmail;
-    Uri imageUri;
     private int IMAGE_CAPTURE_CODE = 1001;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
-//    private final ActivityResultLauncher<Void> takePicturePreview = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(result));
+    // private final ActivityResultLauncher<Void> takePicturePreview = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(result));
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SdCardPath")
@@ -59,17 +56,17 @@ public class MainActivity extends AppCompatActivity {
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         Intent camera = new Intent(MainActivity.this, CustomCameraAPI.class);
         takePicButton = findViewById(R.id.imageButton);
-        takePicButton.setOnClickListener(new View.OnClickListener(){
+        takePicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                startActivityForResult(camera,REQUEST_CODE);
+                startActivityForResult(camera, REQUEST_CODE);
             }
 
         });
         sendEmail = findViewById(R.id.sendEmailButton);
 
 
-        sendEmail.setOnClickListener(new View.OnClickListener(){
+        sendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendEmail();
@@ -82,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         // Lấy ảnh trong storage hoặc chỗ khác thì phải xin permission. Thêm rắc rối. Dù sao cũng lấy string từ web app rồi thả vào storage.
         // Client có nhu cầu save thì chờ lấy code base bên kia rồi edit sau.
         try {
-            FileOutputStream fos = openFileOutput("hi",0);
+            FileOutputStream fos = openFileOutput("hi", 0);
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -145,16 +142,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                Log.d("ImageLink",result);
-                File file = new  File(result);
-                if(file.exists()){
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                Log.d("ImageLink", result);
+                File file = new File(result);
+                if (file.exists()) {
 
                     Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
                     //bt.setRotation(90);
@@ -167,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void sendEmail() {
         //Getting content for email
         String email = editTextEmail.getText().toString().trim();
@@ -179,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
         //Executing sendmail to send email
         sm.execute();
     }
-
 
 
 }
