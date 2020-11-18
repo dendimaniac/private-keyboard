@@ -41,20 +41,27 @@ public class QRUtils {
     private static String GenerateQRQuery(LinearLayout layout) {
         StringBuilder query = new StringBuilder("[");
         for (int i = 0; i < layout.getChildCount(); i++) {
-            query.append("{");
             LinearLayout fieldLayout = (LinearLayout) layout.getChildAt(i);
+            String fieldTag = (String) layout.getChildAt(i).getTag();
+            if (!fieldTag.equals("hidden")) {
 
-            if (fieldLayout.getChildAt(1) instanceof EditText) {
-                AddTextFieldJsonSetting(fieldLayout, query);
-            } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
-                AddRadioGroupJsonSetting(fieldLayout, query);
+                query.append("{");
+
+                if (fieldLayout.getChildAt(1) instanceof EditText) {
+                    AddTextFieldJsonSetting(fieldLayout, query);
+                } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
+                    AddRadioGroupJsonSetting(fieldLayout, query);
+                }
+
+                query.append("}");
+
+                if (i < layout.getChildCount() - 1) {
+                    query.append(",");
+                }
             }
-
-            query.append("}");
-
-            if (i < layout.getChildCount() - 1) {
-                query.append(",");
-            }
+        }
+        if(query.length() > 0){
+            query.deleteCharAt(query.length() - 1);
         }
         query.append("]");
         Log.d("QUERY", query.toString());

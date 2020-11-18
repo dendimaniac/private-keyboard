@@ -27,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:tag="hidden">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -39,7 +40,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:tag="wVisible">
 
                 <TextView
                     android:id="@+id/textView"
@@ -62,7 +64,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:tag="wVisible">
 
                 <TextView
                     android:id="@+id/textView2"
@@ -85,7 +88,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:tag="wVisible">
 
                 <TextView
                     android:id="@+id/textView3"
@@ -108,7 +112,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:tag="wVisible">
 
                 <TextView
                     android:id="@+id/textView4"
@@ -131,7 +136,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:tag="wVisible">
 
                 <TextView
                     android:id="@+id/textView5"
@@ -165,7 +171,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:tag="hidden">
 
                 <TextView
                     android:id="@+id/seekBarTitle"
@@ -192,7 +199,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:tag="hidden">
 
                 <Button
                     android:id="@+id/buttonCam"
