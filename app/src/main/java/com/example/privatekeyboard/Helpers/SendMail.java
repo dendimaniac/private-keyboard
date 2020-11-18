@@ -33,18 +33,27 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
     //Information to send email
     private String email;
     private String subject;
-    private String message;
+    private String firstname;
+    private String lastname;
+    private String phonenum;
+    private String sex;
+    private String fileImage = null;
+
 
     //Progressdialog to show while sending email
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String message){
+    public SendMail(Context context, String email, String subject, String firstname,String lastname, String phonenum, String sex, String file){
         //Initializing variables
         this.context = context;
         this.email = email;
         this.subject = subject;
-        this.message = message;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.phonenum = phonenum;
+        this.sex = sex;
+        this.fileImage = file;
     }
 
     @Override
@@ -99,17 +108,21 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
             //Adding message
             //mm.setText(message);
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("This is message body");
-            MimeBodyPart attachment = new MimeBodyPart();
-
-            String filename = "/data/data/com.example.privatekeyboard/images/2020-11-17T17:30:33.707.jpg";//change accordingly
-            DataSource source = new FileDataSource(filename);
-            attachment.setDataHandler(new DataHandler(source));
-            attachment.setFileName("mot buc anh");
-
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
-            multipart.addBodyPart(attachment);
+            messageBodyPart.setText("Your information:" +
+                    "\nFirstname: " + firstname +
+                    "\nLastname: " + lastname +
+                    "\nPhone number: " + phonenum +
+                    "\nSex: " + sex );
+            MimeBodyPart attachment = new MimeBodyPart();
+            if (fileImage != null){
+                String filename = fileImage;//change accordingly
+                DataSource source = new FileDataSource(filename);
+                attachment.setDataHandler(new DataHandler(source));
+                attachment.setFileName("Profile");
+                multipart.addBodyPart(attachment);
+            }
 
             mm.setContent(multipart);
 

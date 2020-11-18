@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
+    String fileImage = null;
 
     private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         if (bundle != null) {
             try {
                 String savedImagePath = bundle.getString("image_path");
-
+                this.fileImage = savedImagePath;
                 File file = new File(savedImagePath);
                 int size = (int) file.length();
                 byte[] bytes = new byte[size];
@@ -138,15 +139,32 @@ public class MainActivity extends AppCompatActivity {
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
     }
-
+    private String getGender()
+    {
+        if (findViewById(R.id.radioMale).isSelected())
+        {
+            return "Male";
+        }
+        else if(findViewById(R.id.radioMale).isSelected())
+        {
+            return "Female";
+        }
+        else
+        {
+            return null;
+        }
+    }
     private void sendEmail() {
         //Getting content for email
         String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
         String subject = "Personal Information";
-        String message = "Hiiiiiiiiiiiii";
+        String firstname= ((EditText) findViewById(R.id.sendMessageTextField)).getText().toString().trim();
+        String lastname= ((EditText) findViewById(R.id.editTextTextPersonName2)).getText().toString().trim();
+        String phonenum= ((EditText) findViewById(R.id.editTextTextPersonName3)).getText().toString().trim();
+        String sex = getGender() ;
 
         //Creating SendMail object
-        SendMail sm = new SendMail(this, email, subject, message);
+        SendMail sm = new SendMail(this, email, subject, firstname,lastname,phonenum,sex,this.fileImage);
 
         //Executing sendmail to send email
         sm.execute();
