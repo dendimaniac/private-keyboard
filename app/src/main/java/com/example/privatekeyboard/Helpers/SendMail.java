@@ -9,30 +9,37 @@ import com.example.privatekeyboard.Data.EmailConfig;
 
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
-public class SendMail extends AsyncTask<Void, Void, Void> {
+public class SendMail extends AsyncTask<Void,Void,Void> {
 
     //Declaring Variables
-    private final Context context;
+    private Context context;
     private Session session;
 
     //Information to send email
-    private final String email;
-    private final String subject;
-    private final String message;
+    private String email;
+    private String subject;
+    private String message;
 
-    //Progress dialog to show while sending email
+    //Progressdialog to show while sending email
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String message) {
+    public SendMail(Context context, String email, String subject, String message){
         //Initializing variables
         this.context = context;
         this.email = email;
@@ -44,7 +51,7 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
     protected void onPreExecute() {
         super.onPreExecute();
         //Showing progress dialog while sending email
-        progressDialog = ProgressDialog.show(context, "Sending message", "Please wait...", false, false);
+        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
     }
 
     @Override
@@ -53,7 +60,7 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
         //Dismissing the progress dialog
         progressDialog.dismiss();
         //Showing a success message
-        Toast.makeText(context, "Message Sent", Toast.LENGTH_LONG).show();
+        Toast.makeText(context,"Message Sent",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -90,7 +97,23 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
             //Adding subject
             mm.setSubject(subject);
             //Adding message
-            mm.setText(message);
+            //mm.setText(message);
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText("This is message body");
+            MimeBodyPart attachment = new MimeBodyPart();
+
+            String filename = "/data/data/com.example.privatekeyboard/images/2020-11-17T17:30:33.707.jpg";//change accordingly
+            DataSource source = new FileDataSource(filename);
+            attachment.setDataHandler(new DataHandler(source));
+            attachment.setFileName("mot buc anh");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(attachment);
+
+            mm.setContent(multipart);
+
+
 
             //Sending email
             Transport.send(mm);
