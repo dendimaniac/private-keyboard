@@ -39,6 +39,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private String sex = "No response";
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
+
     String fileImage = null;
 
     private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
@@ -62,7 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.input_layout);
         ImageView qrImage = findViewById(R.id.qrImage);
-
+        findViewById(R.id.radioMale).setOnClickListener(v -> {
+            sex = "Male";
+            Log.d("Radio", sex);
+        });
+        findViewById(R.id.radioFemale).setOnClickListener(v -> {
+            sex = "Female";
+            Log.d("Radio", sex);
+        });
         profileImageView = findViewById(R.id.takenImage);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -94,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             sendEmail();
         });
 
+
         openCustomCameraButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
             startActivity(intent);
@@ -116,6 +126,11 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
+            if (message.targetRadioButton == 0)
+                sex = "Male";
+            else
+                sex = "Female";
+            Log.d("Radio", message.targetRadioButton.toString());
         }, NewCheckRadio.class);
 
         hubConnection.on("updateTiltAngle", (message) -> {
@@ -139,32 +154,18 @@ public class MainActivity extends AppCompatActivity {
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
     }
-    private String getGender()
-    {
-        if (findViewById(R.id.radioMale).isSelected())
-        {
-            return "Male";
-        }
-        else if(findViewById(R.id.radioMale).isSelected())
-        {
-            return "Female";
-        }
-        else
-        {
-            return null;
-        }
-    }
+
     private void sendEmail() {
         //Getting content for email
         String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
         String subject = "Personal Information";
-        String firstname= ((EditText) findViewById(R.id.sendMessageTextField)).getText().toString().trim();
-        String lastname= ((EditText) findViewById(R.id.editTextTextPersonName2)).getText().toString().trim();
-        String phonenum= ((EditText) findViewById(R.id.editTextTextPersonName3)).getText().toString().trim();
-        String sex = getGender() ;
+        String firstname = ((EditText) findViewById(R.id.sendMessageTextField)).getText().toString().trim();
+        String lastname = ((EditText) findViewById(R.id.editTextTextPersonName2)).getText().toString().trim();
+        String phonenum = ((EditText) findViewById(R.id.editTextTextPersonName3)).getText().toString().trim();
+
 
         //Creating SendMail object
-        SendMail sm = new SendMail(this, email, subject, firstname,lastname,phonenum,sex,this.fileImage);
+        SendMail sm = new SendMail(this, email, subject, firstname, lastname, phonenum, sex, this.fileImage);
 
         //Executing sendmail to send email
         sm.execute();
