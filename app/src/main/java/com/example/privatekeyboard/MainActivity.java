@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.privatekeyboard.Data.ConfirmQRScan;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
+import com.example.privatekeyboard.Data.TakingPicture;
 import com.example.privatekeyboard.Data.TiltAngle;
 import com.example.privatekeyboard.Helpers.QRUtils;
 import com.example.privatekeyboard.Helpers.SendMail;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+    private final String functionUrl = "http://192.168.1.94:7071/api";
     private LinearLayout linearLayout;
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
@@ -124,6 +125,16 @@ public class MainActivity extends AppCompatActivity {
             TextView tiltTextView = findViewById(R.id.tiltValue);
             tiltTextView.setText("Angle:" + message.value);
         }, TiltAngle.class);
+
+        hubConnection.on("takePicture", (message) -> {
+            if (!message.sender.equals(QRUtils.connectedUuid)) return;
+            Log.d("isTakingPicture", String.valueOf(message.value));
+            if(message.value == true) {
+                Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
+                startActivity(intent);
+            }
+
+        }, TakingPicture.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);
