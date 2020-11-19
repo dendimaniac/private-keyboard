@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
+import com.example.privatekeyboard.Data.EmailConfig;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Data.TakingPicture;
@@ -33,13 +34,20 @@ import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+
+import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
 public class MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private String sex = "No response";
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
@@ -48,7 +56,10 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private final String functionUrl = "http://192.168.1.94:7071/api";
+
+    String fileImage = null;
+
+    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
@@ -62,13 +73,20 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.input_layout);
         ImageView qrImage = findViewById(R.id.qrImage);
-
+        findViewById(R.id.radioMale).setOnClickListener(v -> {
+            sex = "Male";
+            Log.d("Radio", sex);
+        });
+        findViewById(R.id.radioFemale).setOnClickListener(v -> {
+            sex = "Female";
+            Log.d("Radio", sex);
+        });
         profileImageView = findViewById(R.id.takenImage);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             try {
                 String savedImagePath = bundle.getString("image_path");
-
+                this.fileImage = savedImagePath;
                 File file = new File(savedImagePath);
                 int size = (int) file.length();
                 byte[] bytes = new byte[size];
@@ -94,19 +112,25 @@ public class MainActivity extends AppCompatActivity {
             sendEmail();
         });
 
+
         openCustomCameraButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
             startActivity(intent);
         });
 
         linearLayout = findViewById(R.id.input_layout);
+        if (!saveInstance.isEmpty()) {
+            getInstance(saveInstance);
+        }
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
+            Log.d("NewMessageTI", message.targetInput.toString());
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
+            saveInstance.put("InputField-" + message.targetInput.toString(), message.text);
         }, NewMessage.class);
 
         hubConnection.on("selectRadioGroup", (message) -> {
@@ -114,8 +138,19 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
             LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
+            Log.d("NewMessageRadio", message.targetRadioGroup.toString());
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
+            if (message.targetRadioButton == 0) {
+                saveInstance.put("RadioField-Sex", "radioMale");
+                sex = "Male";
+            } else {
+                saveInstance.put("RadioField-Sex", "radioFemale");
+                sex = "Female";
+            }
+            Log.d("Radio",sex);
+            Log.d("RadioSex", message.targetRadioButton.toString());
+
         }, NewCheckRadio.class);
 
         hubConnection.on("updateTiltAngle", (message) -> {
@@ -124,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TiltAngle", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
             tiltTextView.setText("Angle:" + message.value);
+            saveInstance.put("TextViewField-Tilt", message.value.toString());
+
         }, TiltAngle.class);
 
         hubConnection.on("takePicture", (message) -> {
@@ -148,16 +185,28 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.start().blockingAwait();
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
-    }
+        if (QRUtils.connectedUuid != null)
+        {
+            qrImage.setVisibility(View.INVISIBLE);
 
+        }
+    }
+    private void saveInstanceNew(){
+
+    }
     private void sendEmail() {
         //Getting content for email
         String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
         String subject = "Personal Information";
-        String message = "Hiiiiiiiiiiiii";
+        String firstname = ((EditText) findViewById(R.id.sendMessageTextField)).getText().toString().trim();
+        String lastname = ((EditText) findViewById(R.id.editTextTextPersonName2)).getText().toString().trim();
+        String phonenum = ((EditText) findViewById(R.id.editTextTextPersonName3)).getText().toString().trim();
+
 
         //Creating SendMail object
-        SendMail sm = new SendMail(this, email, subject, message);
+        Log.d("RadioMail",sex);
+
+        SendMail sm = new SendMail(this, email, subject, firstname, lastname, phonenum, sex, this.fileImage);
 
         //Executing sendmail to send email
         sm.execute();
@@ -171,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -180,5 +230,32 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Portrait Mode", Toast.LENGTH_LONG).show();
         }
         rotateImageToUpright(((BitmapDrawable) profileImageView.getDrawable()).getBitmap());
+    }
+
+    private void getInstance(HashMap<String, String> hashMap) {
+        Set<String> keySet = hashMap.keySet();
+        for (String key : keySet) {
+            String[] arrOfStr = key.split("-", 2);
+            if (arrOfStr[0].equals("InputField")) {
+                LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));
+                ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
+            } else if ((arrOfStr[0].equals("RadioField"))){
+                RadioGroup radio = findViewById(R.id.radioSex);
+                switch (hashMap.get(key)) {
+                    case "radioMale":
+                        radio.check(R.id.radioMale);
+                        sex = "Male";
+                        break;
+                    case "radioFemale":
+                        radio.check(R.id.radioFemale);
+                        sex = "Female";
+                        break;
+                }
+            }
+            else {
+                TextView tiltTextView = findViewById(R.id.tiltValue);
+                tiltTextView.setText("Angle:" + hashMap.get(key));
+            }
+        }
     }
 }

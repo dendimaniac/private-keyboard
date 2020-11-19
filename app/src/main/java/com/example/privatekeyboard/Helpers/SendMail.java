@@ -9,42 +9,58 @@ import com.example.privatekeyboard.Data.EmailConfig;
 
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
-public class SendMail extends AsyncTask<Void, Void, Void> {
+public class SendMail extends AsyncTask<Void,Void,Void> {
 
     //Declaring Variables
-    private final Context context;
+    private Context context;
     private Session session;
 
     //Information to send email
-    private final String email;
-    private final String subject;
-    private final String message;
+    private String email;
+    private String subject;
+    private String firstname;
+    private String lastname;
+    private String phonenum;
+    private String sex;
+    private String fileImage = null;
 
-    //Progress dialog to show while sending email
+
+    //Progressdialog to show while sending email
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String message) {
+    public SendMail(Context context, String email, String subject, String firstname,String lastname, String phonenum, String sex, String file){
         //Initializing variables
         this.context = context;
         this.email = email;
         this.subject = subject;
-        this.message = message;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.phonenum = phonenum;
+        this.sex = sex;
+        this.fileImage = file;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         //Showing progress dialog while sending email
-        progressDialog = ProgressDialog.show(context, "Sending message", "Please wait...", false, false);
+        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
     }
 
     @Override
@@ -53,7 +69,7 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
         //Dismissing the progress dialog
         progressDialog.dismiss();
         //Showing a success message
-        Toast.makeText(context, "Message Sent", Toast.LENGTH_LONG).show();
+        Toast.makeText(context,"Message Sent",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -90,7 +106,27 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
             //Adding subject
             mm.setSubject(subject);
             //Adding message
-            mm.setText(message);
+            //mm.setText(message);
+            BodyPart messageBodyPart = new MimeBodyPart();
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            messageBodyPart.setText("Your information:" +
+                    "\nFirstname: " + firstname +
+                    "\nLastname: " + lastname +
+                    "\nPhone number: " + phonenum +
+                    "\nSex: " + sex );
+            MimeBodyPart attachment = new MimeBodyPart();
+            if (fileImage != null){
+                String filename = fileImage;//change accordingly
+                DataSource source = new FileDataSource(filename);
+                attachment.setDataHandler(new DataHandler(source));
+                attachment.setFileName("Profile");
+                multipart.addBodyPart(attachment);
+            }
+
+            mm.setContent(multipart);
+
+
 
             //Sending email
             Transport.send(mm);
