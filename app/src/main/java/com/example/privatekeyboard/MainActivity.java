@@ -115,7 +115,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         linearLayout = findViewById(R.id.input_layout);
-        getInstance(saveInstance);
+        if (!saveInstance.isEmpty()) {
+            getInstance(saveInstance);
+        }
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -165,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.start().blockingAwait();
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
+        if (QRUtils.connectedUuid != null)
+        {
+            qrImage.setVisibility(View.INVISIBLE);
+
+        }
     }
 
     private void sendEmail() {
