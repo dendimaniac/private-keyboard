@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
+import com.example.privatekeyboard.Data.EmailConfig;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Data.TiltAngle;
@@ -36,6 +37,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+
+import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
 public class MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -110,13 +115,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         linearLayout = findViewById(R.id.input_layout);
+        getInstance(saveInstance);
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
+            Log.d("NewMessageTI", message.targetInput.toString());
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
+            saveInstance.put(message.targetInput.toString(), message.text);
         }, NewMessage.class);
 
         hubConnection.on("selectRadioGroup", (message) -> {
@@ -124,12 +132,16 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
 
             LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
+            Log.d("NewMessageRadio", message.targetRadioGroup.toString());
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
-            if (message.targetRadioButton == 0)
+            if (message.targetRadioButton == 0) {
+                saveInstance.put("sex", "radioMale");
                 sex = "Male";
-            else
+            } else {
+                saveInstance.put("sex", "radioFemale");
                 sex = "Female";
+            }
             Log.d("Radio", message.targetRadioButton.toString());
         }, NewCheckRadio.class);
 
@@ -180,6 +192,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        // Save UI state changes to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        savedInstanceState.putBoolean("MyBoolean", true);
+        savedInstanceState.putDouble("myDouble", 1.9);
+        savedInstanceState.putInt("MyInt", 1);
+        savedInstanceState.putString("MyString", "Welcome back to Android");
+        // etc.
+    }
+
+    @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -188,5 +213,25 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Portrait Mode", Toast.LENGTH_LONG).show();
         }
         rotateImageToUpright(((BitmapDrawable) profileImageView.getDrawable()).getBitmap());
+    }
+
+    private void getInstance(HashMap<String, String> hashMap) {
+        Set<String> keySet = hashMap.keySet();
+        for (String key : keySet) {
+            if (!key.equals("sex")) {
+                LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(key));
+                ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
+            } else {
+                RadioGroup radio = findViewById(R.id.radioSex);
+                switch (hashMap.get(key)) {
+                    case "radioMale":
+                        radio.check(R.id.radioMale);
+                        break;
+                    case "radioFemale":
+                        radio.check(R.id.radioFemale);
+                        break;
+                }
+            }
+        }
     }
 }
