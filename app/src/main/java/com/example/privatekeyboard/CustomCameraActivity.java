@@ -67,12 +67,15 @@ public class CustomCameraActivity extends AppCompatActivity {
     }
 
     private Button btnCapture;
+    private Button btnRetake;
+    private Button btnCancel;
     private TextureView textureView;
     private String cameraId;
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSessions;
     private CaptureRequest.Builder captureRequestBuilder;
     private Size imageDimension;
+    private boolean isCapturing = true;
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
@@ -125,12 +128,10 @@ public class CustomCameraActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if(message.value.equals("capture")) {
+            if (message.value.equals("capture"))
                 takePicture();
-            }
-            else{
+            else
                 finish();
-            }
             hubConnection.stop();
 
         }, TakingPicture.class);
@@ -142,6 +143,14 @@ public class CustomCameraActivity extends AppCompatActivity {
         textureView.setSurfaceTextureListener(textureListener);
         btnCapture = findViewById(R.id.btnCapture);
         btnCapture.setOnClickListener(view -> takePicture());
+        btnRetake = findViewById(R.id.btnRetake);
+        btnRetake.setOnClickListener(view -> {
+            isCapturing = true;
+            createCameraPreview();
+        });
+        btnCancel = findViewById(R.id.buttonCancel);
+        btnCancel.setOnClickListener(v -> finish());
+
     }
 
     private void takePicture() {
@@ -179,19 +188,28 @@ public class CustomCameraActivity extends AppCompatActivity {
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
-                    try (Image image = imageReader.acquireLatestImage()) {
-                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                        byte[] bytes = new byte[buffer.capacity()];
-                        buffer.get(bytes);
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-                        Bitmap rotatedBitmap = rotateImageToUpright(bitmap);
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] byteArray = stream.toByteArray();
-                        createFile(byteArray);
-                        Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
-                        intent.putExtra("image_path", file.getPath());
-                        startActivity(intent);
+                    if (isCapturing) {
+                        isCapturing = false;
+                        try (Image image = imageReader.acquireNextImage()) {
+                            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                            byte[] bytes = new byte[buffer.remaining()];
+                            buffer.get(bytes);
+                        }
+                    } else {
+                        try (Image image = imageReader.acquireLatestImage()) {
+                            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                            byte[] bytes = new byte[buffer.capacity()];
+                            buffer.get(bytes);
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                            Bitmap rotatedBitmap = rotateImageToUpright(bitmap);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            byte[] byteArray = stream.toByteArray();
+                            createFile(byteArray);
+                            Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
+                            intent.putExtra("image_path", file.getPath());
+                            startActivity(intent);
+                        }
                     }
                 }
 
@@ -246,6 +264,7 @@ public class CustomCameraActivity extends AppCompatActivity {
     private void createCameraPreview() {
         try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
+
             assert texture != null;
             texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
@@ -271,6 +290,7 @@ public class CustomCameraActivity extends AppCompatActivity {
     }
 
     private void updatePreview() {
+
         if (cameraDevice == null)
             Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
@@ -279,6 +299,7 @@ public class CustomCameraActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
     }
 
     private void openCamera(int width, int height) {
