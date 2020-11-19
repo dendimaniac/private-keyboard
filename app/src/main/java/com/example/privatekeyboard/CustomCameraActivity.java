@@ -36,6 +36,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.privatekeyboard.Data.TakingPicture;
+import com.example.privatekeyboard.Helpers.QRUtils;
+import com.microsoft.signalr.HubConnection;
+import com.microsoft.signalr.HubConnectionBuilder;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -110,11 +115,26 @@ public class CustomCameraActivity extends AppCompatActivity {
         }
     };
     private HandlerThread mBackgroundThread;
+    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera);
+        HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
+        hubConnection.on("takePicture", (message) -> {
+            if (!message.sender.equals(QRUtils.connectedUuid)) return;
+            Log.d("isTakingPicture", String.valueOf(message.value));
+            if(message.value) {
+                takePicture();
+            }
+            else{
+                finish();
+            }
+            hubConnection.stop();
+
+        }, TakingPicture.class);
+        hubConnection.start().blockingAwait();
 
         textureView = findViewById(R.id.textureView);
         //From Java 1.4 , you can use keyword 'assert' to check expression true or false
@@ -129,6 +149,7 @@ public class CustomCameraActivity extends AppCompatActivity {
             return;
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
+
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
             if (characteristics != null)

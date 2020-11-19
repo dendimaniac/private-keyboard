@@ -70,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
         linearLayout = findViewById(R.id.input_layout);
         ImageView qrImage = findViewById(R.id.qrImage);
         findViewById(R.id.radioMale).setOnClickListener(v -> {
@@ -167,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
             if(message.value == true) {
+                hubConnection.stop();
                 Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
                 startActivity(intent);
             }
