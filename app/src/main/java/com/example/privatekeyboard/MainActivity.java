@@ -169,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if(message.value == true) {
-                hubConnection.stop();
+            if(message.value.equals("on")) {
+//                hubConnection.stop();
                 Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
                 startActivity(intent);
             }
