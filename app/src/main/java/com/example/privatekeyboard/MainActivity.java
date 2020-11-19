@@ -33,6 +33,8 @@ import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
             Log.d("NewMessageTI", message.targetInput.toString());
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
-            saveInstance.put(message.targetInput.toString(), message.text);
+            saveInstance.put("InputField-" + message.targetInput.toString(), message.text);
         }, NewMessage.class);
 
         hubConnection.on("selectRadioGroup", (message) -> {
@@ -138,13 +140,15 @@ public class MainActivity extends AppCompatActivity {
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
             if (message.targetRadioButton == 0) {
-                saveInstance.put("sex", "radioMale");
+                saveInstance.put("RadioField-Sex", "radioMale");
                 sex = "Male";
             } else {
-                saveInstance.put("sex", "radioFemale");
+                saveInstance.put("RadioField-Sex", "radioFemale");
                 sex = "Female";
             }
-            Log.d("Radio", message.targetRadioButton.toString());
+            Log.d("Radio",sex);
+            Log.d("RadioSex", message.targetRadioButton.toString());
+
         }, NewCheckRadio.class);
 
         hubConnection.on("updateTiltAngle", (message) -> {
@@ -153,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TiltAngle", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
             tiltTextView.setText("Angle:" + message.value);
+            saveInstance.put("TextViewField-Tilt", message.value.toString());
+
         }, TiltAngle.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
@@ -173,7 +179,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    private void saveInstanceNew(){
 
+    }
     private void sendEmail() {
         //Getting content for email
         String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
@@ -184,6 +192,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Creating SendMail object
+        Log.d("RadioMail",sex);
+
         SendMail sm = new SendMail(this, email, subject, firstname, lastname, phonenum, sex, this.fileImage);
 
         //Executing sendmail to send email
@@ -213,19 +223,26 @@ public class MainActivity extends AppCompatActivity {
     private void getInstance(HashMap<String, String> hashMap) {
         Set<String> keySet = hashMap.keySet();
         for (String key : keySet) {
-            if (!key.equals("sex")) {
-                LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(key));
+            String[] arrOfStr = key.split("-", 2);
+            if (arrOfStr[0].equals("InputField")) {
+                LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));
                 ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
-            } else {
+            } else if ((arrOfStr[0].equals("RadioField"))){
                 RadioGroup radio = findViewById(R.id.radioSex);
                 switch (hashMap.get(key)) {
                     case "radioMale":
                         radio.check(R.id.radioMale);
+                        sex = "Male";
                         break;
                     case "radioFemale":
                         radio.check(R.id.radioFemale);
+                        sex = "Female";
                         break;
                 }
+            }
+            else {
+                TextView tiltTextView = findViewById(R.id.tiltValue);
+                tiltTextView.setText("Angle:" + hashMap.get(key));
             }
         }
     }
