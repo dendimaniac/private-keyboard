@@ -117,13 +117,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         openCustomCameraButton.setOnClickListener(v -> {
+            Log.d("Camera","Clicked");
+            saveInstanceNew();
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
             startActivity(intent);
         });
 
         linearLayout = findViewById(R.id.input_layout);
-        if (!saveInstance.isEmpty()) {
-            getInstance(saveInstance);
+        if (!EmailConfig.saveInstanceNew.isEmpty()) {
+            getInstance(EmailConfig.saveInstanceNew);
         }
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
@@ -170,9 +172,8 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
             if(message.value == true) {
+                openCustomCameraButton.callOnClick();
                 hubConnection.stop();
-                Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
-                startActivity(intent);
             }
 
         }, TakingPicture.class);
@@ -196,7 +197,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void saveInstanceNew(){
+        EmailConfig.saveInstanceNew.put("RadioField-Sex", "No Response");
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+            LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
+            String fieldTag = (String) linearLayout.getChildAt(i).getTag();
+            if (!fieldTag.equals("hidden")) {
 
+                if (fieldLayout.getChildAt(1) instanceof EditText) {
+                    EmailConfig.saveInstanceNew.put("InputField-"+i, ((EditText) fieldLayout.getChildAt(1)).getText().toString().trim());
+                } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
+                    if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(0)).isChecked())
+                        EmailConfig.saveInstanceNew.put("RadioField-Sex", "radioMale");
+                    else
+                        EmailConfig.saveInstanceNew.put("RadioField-Sex", "radioFemale");
+                }
+
+            }
+        }
     }
     private void sendEmail() {
         //Getting content for email
