@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if (message.value) {
+            if (message.value.equals("on")) {
                 openCustomCameraButton.callOnClick();
                 hubConnection.stop();
             }

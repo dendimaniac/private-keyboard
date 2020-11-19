@@ -125,7 +125,7 @@ public class CustomCameraActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if(message.value) {
+            if(message.value.equals("capture")) {
                 takePicture();
             }
             else{
