@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
-import com.example.privatekeyboard.Data.EmailConfig;
 import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Data.TakingPicture;
@@ -34,8 +33,6 @@ import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
-import org.w3c.dom.Text;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,11 +40,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+
 import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
 public class MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    private String sex = "No response";
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
@@ -71,19 +68,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         linearLayout = findViewById(R.id.input_layout);
         ImageView qrImage = findViewById(R.id.qrImage);
-        findViewById(R.id.radioMale).setOnClickListener(v -> {
-            sex = "Male";
-            Log.d("Radio", sex);
-        });
-        findViewById(R.id.radioFemale).setOnClickListener(v -> {
-            sex = "Female";
-            Log.d("Radio", sex);
-        });
+
         profileImageView = findViewById(R.id.takenImage);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -117,15 +108,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         openCustomCameraButton.setOnClickListener(v -> {
-            Log.d("Camera","Clicked");
-            saveInstanceNew();
+            saveInstance();
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
             startActivity(intent);
         });
 
         linearLayout = findViewById(R.id.input_layout);
-        if (!EmailConfig.saveInstanceNew.isEmpty()) {
-            getInstance(EmailConfig.saveInstanceNew);
+        if (!saveInstance.isEmpty()) {
+            getInstance(saveInstance);
         }
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
@@ -135,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
             Log.d("NewMessageTI", message.targetInput.toString());
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
-            saveInstance.put("InputField-" + message.targetInput.toString(), message.text);
         }, NewMessage.class);
 
         hubConnection.on("selectRadioGroup", (message) -> {
@@ -146,15 +135,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("NewMessageRadio", message.targetRadioGroup.toString());
             RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
             runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
-            if (message.targetRadioButton == 0) {
-                saveInstance.put("RadioField-Sex", "radioMale");
-                sex = "Male";
-            } else {
-                saveInstance.put("RadioField-Sex", "radioFemale");
-                sex = "Female";
-            }
-            Log.d("Radio",sex);
-            Log.d("RadioSex", message.targetRadioButton.toString());
+
 
         }, NewCheckRadio.class);
 
@@ -171,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if(message.value == true) {
+            if (message.value) {
                 openCustomCameraButton.callOnClick();
                 hubConnection.stop();
             }
@@ -190,46 +171,57 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.start().blockingAwait();
 
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
-        if (QRUtils.connectedUuid != null)
-        {
+        if (QRUtils.connectedUuid != null) {
             qrImage.setVisibility(View.INVISIBLE);
 
         }
     }
-    private void saveInstanceNew(){
-        EmailConfig.saveInstanceNew.put("RadioField-Sex", "No Response");
+
+    private void saveInstance() {
+        saveInstance.put("RadioField-Sex", "No Response");
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {
 
                 if (fieldLayout.getChildAt(1) instanceof EditText) {
-                    EmailConfig.saveInstanceNew.put("InputField-"+i, ((EditText) fieldLayout.getChildAt(1)).getText().toString().trim());
+                    saveInstance.put("InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText(), ((EditText) fieldLayout.getChildAt(1)).getText().toString().trim());
+                    Log.d("InputField", "InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText());
                 } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
                     if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(0)).isChecked())
-                        EmailConfig.saveInstanceNew.put("RadioField-Sex", "radioMale");
-                    else
-                        EmailConfig.saveInstanceNew.put("RadioField-Sex", "radioFemale");
+                        saveInstance.put("RadioField-Sex", "Male");
+                    else if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(1)).isChecked())
+                        saveInstance.put("RadioField-Sex", "Female");
                 }
 
             }
         }
     }
+
     private void sendEmail() {
+        saveInstance();
         //Getting content for email
-        String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
         String subject = "Personal Information";
-        String firstname = ((EditText) findViewById(R.id.sendMessageTextField)).getText().toString().trim();
-        String lastname = ((EditText) findViewById(R.id.editTextTextPersonName2)).getText().toString().trim();
-        String phonenum = ((EditText) findViewById(R.id.editTextTextPersonName3)).getText().toString().trim();
-
-
-        //Creating SendMail object
-        Log.d("RadioMail",sex);
-
-        SendMail sm = new SendMail(this, email, subject, firstname, lastname, phonenum, sex, this.fileImage);
-
-        //Executing sendmail to send email
+        String firstName = null, lastName = null, phoneNum = null, email = null;
+        String gender = "No response";
+        Set<String> keySet = saveInstance.keySet();
+        for (String key : keySet) {
+            String[] arrOfStr = key.split("-", 3);
+            if (arrOfStr[0].equals("InputField")) {
+                if (arrOfStr[2].equals("First name"))
+                    firstName = saveInstance.get(key);
+                if (arrOfStr[2].equals("Last name"))
+                    lastName = saveInstance.get(key);
+                if (arrOfStr[2].equals("Email Address"))
+                    email = saveInstance.get(key);
+                if (arrOfStr[2].equals("Phone number"))
+                    phoneNum = saveInstance.get(key);
+            }
+            if (arrOfStr[0].equals("RadioField")) {
+                gender = saveInstance.get(key);
+            }
+        }
+        SendMail sm = new SendMail(this, email, subject, firstName, lastName, phoneNum, gender, this.fileImage);
         sm.execute();
     }
 
@@ -256,24 +248,22 @@ public class MainActivity extends AppCompatActivity {
     private void getInstance(HashMap<String, String> hashMap) {
         Set<String> keySet = hashMap.keySet();
         for (String key : keySet) {
-            String[] arrOfStr = key.split("-", 2);
+            String[] arrOfStr = key.split("-", 3);
+
             if (arrOfStr[0].equals("InputField")) {
                 LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));
                 ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
-            } else if ((arrOfStr[0].equals("RadioField"))){
+            } else if ((arrOfStr[0].equals("RadioField"))) {
                 RadioGroup radio = findViewById(R.id.radioSex);
                 switch (hashMap.get(key)) {
-                    case "radioMale":
+                    case "Male":
                         radio.check(R.id.radioMale);
-                        sex = "Male";
                         break;
-                    case "radioFemale":
+                    case "Female":
                         radio.check(R.id.radioFemale);
-                        sex = "Female";
                         break;
                 }
-            }
-            else {
+            } else {
                 TextView tiltTextView = findViewById(R.id.tiltValue);
                 tiltTextView.setText("Angle:" + hashMap.get(key));
             }

@@ -25,7 +25,7 @@ public class QRUtils {
     // Deployment web app URL: https://lively-stone-01c8fc003.azurestaticapps.net/
     // Development web app URL (example): http://192.168.1.149:3000/
 
-    public static void SetNewQRBitmap(ImageView qrImage, LinearLayout formLinearLayout) {
+        public static void SetNewQRBitmap(ImageView qrImage, LinearLayout formLinearLayout) {
         newUuid = UUID.randomUUID().toString();
         Log.d("NewUUID", newUuid);
         String settings = GenerateQRQuery(formLinearLayout);
