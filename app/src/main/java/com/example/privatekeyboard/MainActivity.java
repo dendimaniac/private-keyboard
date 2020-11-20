@@ -200,28 +200,28 @@ public class  MainActivity extends AppCompatActivity {
 
     private void sendEmail() {
         saveInstance();
-        //Getting content for email
+        //Getting content for clientEmail
         String subject = "Personal Information";
-        String firstName = null, lastName = null, phoneNum = null, email = null;
-        String gender = "No response";
+        String fullName = null, companyName = null, clientEmail = null;
+        //String gender = "No response";
         Set<String> keySet = saveInstance.keySet();
         for (String key : keySet) {
             String[] arrOfStr = key.split("-", 3);
             if (arrOfStr[0].equals("InputField")) {
-                if (arrOfStr[2].equals("First name"))
-                    firstName = saveInstance.get(key);
-                if (arrOfStr[2].equals("Last name"))
-                    lastName = saveInstance.get(key);
-                if (arrOfStr[2].equals("Email Address"))
-                    email = saveInstance.get(key);
-                if (arrOfStr[2].equals("Phone number"))
-                    phoneNum = saveInstance.get(key);
+                if (arrOfStr[2].equals("Full name"))
+                    fullName = saveInstance.get(key);
+                if (arrOfStr[2].equals("Company name"))
+                    companyName = saveInstance.get(key);
+//                if (arrOfStr[2].equals("Email Address"))
+//                    clientEmail = saveInstance.get(key);
+//                if (arrOfStr[2].equals("Phone number"))
+//                    phoneNum = saveInstance.get(key);
             }
 //            if (arrOfStr[0].equals("RadioField")) {
 //                gender = saveInstance.get(key);
 //            }
         }
-        SendMail sm = new SendMail(this, email, subject, firstName, lastName, phoneNum, gender, this.fileImage);
+        SendMail sm = new SendMail(this, clientEmail, subject, fullName, companyName, this.fileImage);
         sm.execute();
     }
 

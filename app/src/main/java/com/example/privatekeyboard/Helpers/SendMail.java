@@ -33,10 +33,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
     //Information to send email
     private String email;
     private String subject;
-    private String firstname;
-    private String lastname;
-    private String phonenum;
-    private String sex;
+    private String fullName;
+    private String companyName;
     private String fileImage = null;
 
 
@@ -44,15 +42,13 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String firstname,String lastname, String phonenum, String sex, String file){
+    public SendMail(Context context, String email, String subject, String fullName,String companyName, String file){
         //Initializing variables
         this.context = context;
         this.email = email;
         this.subject = subject;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phonenum = phonenum;
-        this.sex = sex;
+        this.fullName = fullName;
+        this.companyName = companyName;
         this.fileImage = file;
     }
 
@@ -111,10 +107,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
             messageBodyPart.setText("Your information:" +
-                    "\nFirstname: " + firstname +
-                    "\nLastname: " + lastname +
-                    "\nPhone number: " + phonenum +
-                    "\nSex: " + sex );
+                    "\nFirstname: " + fullName +
+                    "\nLastname: " + companyName);
             MimeBodyPart attachment = new MimeBodyPart();
             if (fileImage != null){
                 String filename = fileImage;//change accordingly
