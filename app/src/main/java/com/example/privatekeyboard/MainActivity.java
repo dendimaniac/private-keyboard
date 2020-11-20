@@ -45,7 +45,6 @@ import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
 public class  MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -53,29 +52,26 @@ public class  MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-
     String fileImage = null;
-
-    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
     private LinearLayout linearLayout;
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
-    // private final ActivityResultLauncher<Void> takePicturePreview = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> ((ImageView) findViewById(R.id.qrImage)).setImageBitmap(result));
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         linearLayout = findViewById(R.id.input_layout);
-        ImageView qrImage = findViewById(R.id.qrImage);
 
+        ImageView qrImage = findViewById(R.id.qrImage);
         profileImageView = findViewById(R.id.takenImage);
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             try {
@@ -100,30 +96,25 @@ public class  MainActivity extends AppCompatActivity {
         }
 
         Button sendEmailButton = findViewById(R.id.sendEmailButton);
+        sendEmailButton.setOnClickListener(view -> sendEmail());
+
         Button openCustomCameraButton = findViewById(R.id.buttonCam);
-
-        sendEmailButton.setOnClickListener(view -> {
-            sendEmail();
-        });
-
-
         openCustomCameraButton.setOnClickListener(v -> {
             saveInstance();
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
             startActivity(intent);
         });
 
-        linearLayout = findViewById(R.id.input_layout);
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
+        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
             Log.d("NewMessage", message.text);
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(message.targetInput);
-            Log.d("NewMessageTI", message.targetInput.toString());
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
 
@@ -135,18 +126,14 @@ public class  MainActivity extends AppCompatActivity {
 //            Log.d("NewMessageRadio", message.targetRadioGroup.toString());
 //            RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
 //            runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
-//
-//
 //        }, NewCheckRadio.class);
 
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
             Log.d("TiltAngle", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
-            tiltTextView.setText("Angle:" + message.value);
+            runOnUiThread(() -> tiltTextView.setText("Angle:" + message.value));
             saveInstance.put("TextViewField-Tilt", message.value.toString());
-
         }, TiltAngle.class);
 
         hubConnection.on("takePicture", (message) -> {
@@ -156,20 +143,22 @@ public class  MainActivity extends AppCompatActivity {
                 openCustomCameraButton.callOnClick();
                 hubConnection.stop();
             }
-
         }, TakingPicture.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
             Log.d("ConfirmQRScan", message.uuid);
             if (!message.uuid.equals(QRUtils.newUuid)) return;
+            // Set new QR bitmap to avoid duplicate connection
+            QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
             // hide the QR view after connecting successfully
             qrImage.setVisibility(View.INVISIBLE);
+            // Set connection ID
             QRUtils.connectedUuid = message.uuid;
-            QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         }, ConfirmQRScan.class);
-
+        //Start the connection
         hubConnection.start().blockingAwait();
 
+        //Check if is there already a connection when go back from other activity
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         if (QRUtils.connectedUuid != null) {
             qrImage.setVisibility(View.INVISIBLE);
@@ -212,8 +201,8 @@ public class  MainActivity extends AppCompatActivity {
                     fullName = saveInstance.get(key);
                 if (arrOfStr[2].equals("Company name"))
                     companyName = saveInstance.get(key);
-//                if (arrOfStr[2].equals("Email Address"))
-//                    clientEmail = saveInstance.get(key);
+                if (arrOfStr[2].equals("Email Address"))
+                    clientEmail = saveInstance.get(key);
 //                if (arrOfStr[2].equals("Phone number"))
 //                    phoneNum = saveInstance.get(key);
             }
@@ -253,7 +242,7 @@ public class  MainActivity extends AppCompatActivity {
             if (arrOfStr[0].equals("InputField")) {
                 LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));
                 ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
-            } else if ((arrOfStr[0].equals("RadioField"))) {
+            } /*else if ((arrOfStr[0].equals("RadioField"))) {
 //                RadioGroup radio = findViewById(R.id.radioSex);
 //                switch (hashMap.get(key)) {
 //                    case "Male":
@@ -263,7 +252,7 @@ public class  MainActivity extends AppCompatActivity {
 //                        radio.check(R.id.radioFemale);
 //                        break;
 //                }
-            } else {
+            }*/ else {
                 TextView tiltTextView = findViewById(R.id.tiltValue);
                 tiltTextView.setText("Angle:" + hashMap.get(key));
             }

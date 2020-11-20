@@ -119,20 +119,24 @@ public class CustomCameraActivity extends AppCompatActivity {
     };
     private HandlerThread mBackgroundThread;
     private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+    HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera);
-        HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if (message.value.equals("capture"))
-                takePicture();
-            else
+            if (message.value.equals("retake")){
+                runOnUiThread (() -> btnRetake.callOnClick());
+            }
+            if (message.value.equals("capture")) {
+                btnCapture.callOnClick();
+            }
+            if (message.value.equals("cancel")) {
                 finish();
-            hubConnection.stop();
+            }
 
         }, TakingPicture.class);
         hubConnection.start().blockingAwait();
@@ -207,6 +211,8 @@ public class CustomCameraActivity extends AppCompatActivity {
                             byte[] byteArray = stream.toByteArray();
                             createFile(byteArray);
                             Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
+                            Log.d("isTaking","RetakeFuckUp");
+                            hubConnection.stop();
                             intent.putExtra("image_path", file.getPath());
                             startActivity(intent);
                         }
