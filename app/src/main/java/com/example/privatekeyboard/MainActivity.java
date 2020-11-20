@@ -43,7 +43,7 @@ import java.util.Set;
 
 import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
-public class MainActivity extends AppCompatActivity {
+public class  MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     static {
@@ -127,17 +127,17 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> ((EditText) inputField.getChildAt(1)).setText(message.text));
         }, NewMessage.class);
 
-        hubConnection.on("selectRadioGroup", (message) -> {
-            Log.d("NewCheckRadio", String.valueOf(message.targetRadioButton));
-            if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
-            LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
-            Log.d("NewMessageRadio", message.targetRadioGroup.toString());
-            RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
-            runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
-
-
-        }, NewCheckRadio.class);
+//        hubConnection.on("selectRadioGroup", (message) -> {
+//            Log.d("NewCheckRadio", String.valueOf(message.targetRadioButton));
+//            if (!message.sender.equals(QRUtils.connectedUuid)) return;
+//
+//            LinearLayout fieldLinearLayout = (LinearLayout) linearLayout.getChildAt(message.targetRadioGroup);
+//            Log.d("NewMessageRadio", message.targetRadioGroup.toString());
+//            RadioGroup radioGroup = (RadioGroup) fieldLinearLayout.getChildAt(1);
+//            runOnUiThread(() -> ((RadioButton) radioGroup.getChildAt(message.targetRadioButton)).setChecked(true));
+//
+//
+//        }, NewCheckRadio.class);
 
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveInstance() {
-        saveInstance.put("RadioField-Sex", "No Response");
+//        saveInstance.put("RadioField-Sex", "No Response");
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
@@ -187,12 +187,12 @@ public class MainActivity extends AppCompatActivity {
                 if (fieldLayout.getChildAt(1) instanceof EditText) {
                     saveInstance.put("InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText(), ((EditText) fieldLayout.getChildAt(1)).getText().toString().trim());
                     Log.d("InputField", "InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText());
-                } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
-                    if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(0)).isChecked())
-                        saveInstance.put("RadioField-Sex", "Male");
-                    else if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(1)).isChecked())
-                        saveInstance.put("RadioField-Sex", "Female");
-                }
+                } /*else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
+//                    if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(0)).isChecked())
+//                        saveInstance.put("RadioField-Sex", "Male");
+//                    else if (((RadioButton) ((RadioGroup) fieldLayout.getChildAt(1)).getChildAt(1)).isChecked())
+//                        saveInstance.put("RadioField-Sex", "Female");
+//                }*/
 
             }
         }
@@ -217,9 +217,9 @@ public class MainActivity extends AppCompatActivity {
                 if (arrOfStr[2].equals("Phone number"))
                     phoneNum = saveInstance.get(key);
             }
-            if (arrOfStr[0].equals("RadioField")) {
-                gender = saveInstance.get(key);
-            }
+//            if (arrOfStr[0].equals("RadioField")) {
+//                gender = saveInstance.get(key);
+//            }
         }
         SendMail sm = new SendMail(this, email, subject, firstName, lastName, phoneNum, gender, this.fileImage);
         sm.execute();
@@ -254,15 +254,15 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));
                 ((EditText) inputField.getChildAt(1)).setText(hashMap.get(key));
             } else if ((arrOfStr[0].equals("RadioField"))) {
-                RadioGroup radio = findViewById(R.id.radioSex);
-                switch (hashMap.get(key)) {
-                    case "Male":
-                        radio.check(R.id.radioMale);
-                        break;
-                    case "Female":
-                        radio.check(R.id.radioFemale);
-                        break;
-                }
+//                RadioGroup radio = findViewById(R.id.radioSex);
+//                switch (hashMap.get(key)) {
+//                    case "Male":
+//                        radio.check(R.id.radioMale);
+//                        break;
+//                    case "Female":
+//                        radio.check(R.id.radioFemale);
+//                        break;
+//                }
             } else {
                 TextView tiltTextView = findViewById(R.id.tiltValue);
                 tiltTextView.setText("Angle:" + hashMap.get(key));
