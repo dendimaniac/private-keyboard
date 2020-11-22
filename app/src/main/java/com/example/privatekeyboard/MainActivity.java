@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    //Reactive stuffs after getting back from other activities
     @Override
     protected void onResume() {
         super.onResume();
         linearLayout = findViewById(R.id.input_layout);
-
         ImageView qrImage = findViewById(R.id.qrImage);
         profileImageView = findViewById(R.id.takenImage);
 
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
-        String functionUrl = "http://192.168.1.102:7071/api";
+        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateVisitorCardFields() {
-        ((EditText) findViewById(R.id.visitorName)).setText(((EditText) findViewById(R.id.fullNameText)).getText().toString());
+        ((TextView) findViewById(R.id.visitorName)).setText(((EditText) findViewById(R.id.fullNameText)).getText().toString());
         ((TextView) findViewById(R.id.hostName)).setText(((EditText) findViewById(R.id.hostNameText)).getText().toString());
         ((TextView) findViewById(R.id.companyName)).setText(((EditText) findViewById(R.id.companyNameText)).getText().toString());
         Date validDate = new Date();

@@ -88,7 +88,6 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
         try {
             //Creating MimeMessage object
             MimeMessage mm = new MimeMessage(session);
-
             //Setting sender address
             mm.setFrom(new InternetAddress(EmailConfig.EMAIL));
             //Adding receiver
@@ -108,9 +107,8 @@ public class SendMail extends AsyncTask<Void, Void, Void> {
                 attachment.setFileName("Profile");
                 multipart.addBodyPart(attachment);
             }
-
+            //Packed Email Content
             mm.setContent(multipart);
-
             //Sending email
             Transport.send(mm);
 

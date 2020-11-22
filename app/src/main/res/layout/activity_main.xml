@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:text="Name:" />
 
-                <EditText
+                <TextView
                     android:id="@+id/visitorName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
