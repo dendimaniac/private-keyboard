@@ -1,5 +1,6 @@
 package com.example.privatekeyboard.Helpers;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -27,14 +28,15 @@ import javax.mail.internet.MimeMultipart;
 public class SendMail extends AsyncTask<Void,Void,Void> {
 
     //Declaring Variables
-    private Context context;
-    private Session session;
+
+    @SuppressLint("StaticFieldLeak")
+    private final Context context;
 
     //Information to send email
-    private String email;
-    private String subject;
-    private String fullName;
-    private String companyName;
+    private final String email;
+    private final String subject;
+    private final String fullName;
+    private final String companyName;
     private String fileImage = null;
 
 
@@ -73,8 +75,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         //Creating properties
         Properties props = new Properties();
 
-        //Configuring properties for gmail
-        //If you are not using gmail you may need to change the values
+        //Configuring properties for Gmail
+        //If you are not using Gmail you may need to change the values
 
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "465");
@@ -83,7 +85,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
         //Creating a new session
-        session = Session.getDefaultInstance(props,
+        //Authenticating the password
+        Session session = Session.getDefaultInstance(props,
                 new javax.mail.Authenticator() {
                     //Authenticating the password
                     protected PasswordAuthentication getPasswordAuthentication() {
@@ -102,7 +105,6 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
             //Adding subject
             mm.setSubject(subject);
             //Adding message
-            //mm.setText(message);
             BodyPart messageBodyPart = new MimeBodyPart();
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
@@ -117,11 +119,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
                 attachment.setFileName("Profile");
                 multipart.addBodyPart(attachment);
             }
-
+            //Packed the message
             mm.setContent(multipart);
-
-
-
             //Sending email
             Transport.send(mm);
 

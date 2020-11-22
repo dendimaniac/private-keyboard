@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ConvertImage {
 
-    public static String convertImageToString(String filepath){
+    public static String convertImageToString(String filepath) {
 
         InputStream inputStream = null;
 
@@ -44,7 +44,7 @@ public class ConvertImage {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             try {
                 baos.close();
                 inputStream.close();
@@ -58,10 +58,10 @@ public class ConvertImage {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SdCardPath")
-    public static void convertStringToImageByteArray(String imageString){
+    public static void convertStringToImageByteArray(String imageString) {
 
         OutputStream outputStream = null;
-        byte [] imageInByteArray = Base64.decodeBase64(
+        byte[] imageInByteArray = Base64.decodeBase64(
                 imageString);
 
         try {
@@ -72,9 +72,9 @@ public class ConvertImage {
             outputStream.write(imageInByteArray);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally{
+        } finally {
             try {
-                if (outputStream!=null){
+                if (outputStream != null) {
                     outputStream.close();
                 }
             } catch (IOException e) {

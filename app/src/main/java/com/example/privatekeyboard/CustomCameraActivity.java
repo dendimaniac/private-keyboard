@@ -56,8 +56,6 @@ public class CustomCameraActivity extends AppCompatActivity {
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private static final int MAX_PREVIEW_WIDTH = 1920;
-    private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
@@ -125,6 +123,7 @@ public class CustomCameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera);
+        //Reopen connections for image handling
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
@@ -135,7 +134,7 @@ public class CustomCameraActivity extends AppCompatActivity {
                 btnCapture.callOnClick();
             }
             if (message.value.equals("cancel")) {
-                finish();
+                btnCancel.callOnClick();
             }
 
         }, TakingPicture.class);
@@ -211,7 +210,6 @@ public class CustomCameraActivity extends AppCompatActivity {
                             byte[] byteArray = stream.toByteArray();
                             createFile(byteArray);
                             Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
-                            Log.d("isTaking","RetakeFuckUp");
                             hubConnection.stop();
                             intent.putExtra("image_path", file.getPath());
                             startActivity(intent);

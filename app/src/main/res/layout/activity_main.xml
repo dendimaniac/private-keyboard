@@ -202,6 +202,9 @@
                     android:id="@+id/buttonCam"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="0dp"
                     android:text="@string/take_picture" />
             </LinearLayout>
 
@@ -222,13 +225,13 @@
 
     <ImageView
         android:id="@+id/takenImage"
-        android:layout_width="128dp"
+        android:layout_width="96dp"
         android:layout_height="128dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="120dp"
+        android:background="@drawable/hiiii"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/qrImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
@@ -236,12 +239,10 @@
         android:id="@+id/qrImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="120dp"
         android:contentDescription="@string/qr_code"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.817"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 

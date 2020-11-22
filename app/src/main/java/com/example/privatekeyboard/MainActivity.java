@@ -64,14 +64,15 @@ public class  MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+    //Reopen stuffs when switching back to this activity
     @Override
     protected void onResume() {
         super.onResume();
         linearLayout = findViewById(R.id.input_layout);
-
         ImageView qrImage = findViewById(R.id.qrImage);
         profileImageView = findViewById(R.id.takenImage);
 
+        //Get image information
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             try {
@@ -105,6 +106,7 @@ public class  MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        //Get input field data
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
@@ -140,8 +142,8 @@ public class  MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
             if (message.value.equals("on")) {
-                openCustomCameraButton.callOnClick();
                 hubConnection.stop();
+                openCustomCameraButton.callOnClick();
             }
         }, TakingPicture.class);
 
@@ -166,6 +168,7 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
+    //Save data before move to other activity
     private void saveInstance() {
 //        saveInstance.put("RadioField-Sex", "No Response");
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
@@ -186,6 +189,7 @@ public class  MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private void sendEmail() {
         saveInstance();
