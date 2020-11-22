@@ -58,7 +58,6 @@ public class  MainActivity extends AppCompatActivity {
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +107,7 @@ public class  MainActivity extends AppCompatActivity {
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
-        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+        String functionUrl = "http://192.168.1.102:7071/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {

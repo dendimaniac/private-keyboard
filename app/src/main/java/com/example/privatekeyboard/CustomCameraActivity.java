@@ -134,6 +134,9 @@ public class CustomCameraActivity extends AppCompatActivity {
             if (message.value.equals("capture")) {
                 btnCapture.callOnClick();
             }
+            if (message.value.equals("confirm")) {
+                btnCapture.callOnClick();
+            }
             if (message.value.equals("cancel")) {
                 finish();
             }
