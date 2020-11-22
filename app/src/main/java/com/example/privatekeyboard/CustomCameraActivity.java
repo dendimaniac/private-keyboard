@@ -128,8 +128,8 @@ public class CustomCameraActivity extends AppCompatActivity {
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if (message.value.equals("retake")){
-                runOnUiThread (() -> btnRetake.callOnClick());
+            if (message.value.equals("retake")) {
+                runOnUiThread(() -> btnRetake.callOnClick());
             }
             if (message.value.equals("capture")) {
                 btnCapture.callOnClick();
@@ -206,12 +206,9 @@ public class CustomCameraActivity extends AppCompatActivity {
                             buffer.get(bytes);
                             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
                             Bitmap rotatedBitmap = rotateImageToUpright(bitmap);
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                            byte[] byteArray = stream.toByteArray();
-                            createFile(byteArray);
+                            createFile(rotatedBitmap);
                             Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
-                            Log.d("isTaking","RetakeFuckUp");
+                            Log.d("isTaking", "RetakeFuckUp");
                             hubConnection.stop();
                             intent.putExtra("image_path", file.getPath());
                             startActivity(intent);
@@ -219,8 +216,11 @@ public class CustomCameraActivity extends AppCompatActivity {
                     }
                 }
 
-                private void createFile(byte[] fileData) {
+                private void createFile(Bitmap imageBitmap) {
                     try {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] fileData = stream.toByteArray();
                         File path = new File(getApplicationContext().getFilesDir(), "Images");
                         if (!path.exists()) {
                             path.mkdirs();
