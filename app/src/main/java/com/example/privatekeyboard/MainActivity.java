@@ -15,8 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.privatekeyboard.Data.ConfirmQRScan;
-import com.example.privatekeyboard.Data.NewCheckRadio;
 import com.example.privatekeyboard.Data.NewMessage;
 import com.example.privatekeyboard.Data.TakingPicture;
 import com.example.privatekeyboard.Data.TiltAngle;
@@ -34,17 +31,22 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
-
+import java.util.UUID;
 
 import static com.example.privatekeyboard.Data.EmailConfig.saveInstance;
 
-public class  MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -55,24 +57,24 @@ public class  MainActivity extends AppCompatActivity {
     String fileImage = null;
     private LinearLayout linearLayout;
     private ImageView profileImageView;
+    private File visitorCardImageFile;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
     // Development function URL (example): http://192.168.1.149:7071/api
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    //Reopen stuffs when switching back to this activity
+
     @Override
     protected void onResume() {
         super.onResume();
         linearLayout = findViewById(R.id.input_layout);
+
         ImageView qrImage = findViewById(R.id.qrImage);
         profileImageView = findViewById(R.id.takenImage);
 
-        //Get image information
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             try {
@@ -90,6 +92,7 @@ public class  MainActivity extends AppCompatActivity {
                 }
 
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+                ((ImageView) findViewById(R.id.visitorImage)).setImageBitmap(bitmap);
                 profileImageView.setImageBitmap(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -97,7 +100,11 @@ public class  MainActivity extends AppCompatActivity {
         }
 
         Button sendEmailButton = findViewById(R.id.sendEmailButton);
-        sendEmailButton.setOnClickListener(view -> sendEmail());
+        sendEmailButton.setOnClickListener(view -> {
+            updateVisitorCardFields();
+            saveVisitorCard();
+            sendEmail();
+        });
 
         Button openCustomCameraButton = findViewById(R.id.buttonCam);
         openCustomCameraButton.setOnClickListener(v -> {
@@ -106,11 +113,10 @@ public class  MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        //Get input field data
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
-        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+        String functionUrl = "http://192.168.1.102:7071/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -142,8 +148,8 @@ public class  MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
             if (message.value.equals("on")) {
-                hubConnection.stop();
                 openCustomCameraButton.callOnClick();
+                hubConnection.stop();
             }
         }, TakingPicture.class);
 
@@ -168,14 +174,14 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
-    //Save data before move to other activity
     private void saveInstance() {
 //        saveInstance.put("RadioField-Sex", "No Response");
+        saveInstance.clear();
+
         for (int i = 0; i < linearLayout.getChildCount(); i++) {
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {
-
                 if (fieldLayout.getChildAt(1) instanceof EditText) {
                     saveInstance.put("InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText(), ((EditText) fieldLayout.getChildAt(1)).getText().toString().trim());
                     Log.d("InputField", "InputField-" + i + "-" + ((TextView) fieldLayout.getChildAt(0)).getText());
@@ -190,34 +196,6 @@ public class  MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private void sendEmail() {
-        saveInstance();
-        //Getting content for clientEmail
-        String subject = "Personal Information";
-        String fullName = null, companyName = null, clientEmail = null;
-        //String gender = "No response";
-        Set<String> keySet = saveInstance.keySet();
-        for (String key : keySet) {
-            String[] arrOfStr = key.split("-", 3);
-            if (arrOfStr[0].equals("InputField")) {
-                if (arrOfStr[2].equals("Full name"))
-                    fullName = saveInstance.get(key);
-                if (arrOfStr[2].equals("Company name"))
-                    companyName = saveInstance.get(key);
-                if (arrOfStr[2].equals("Email Address"))
-                    clientEmail = saveInstance.get(key);
-//                if (arrOfStr[2].equals("Phone number"))
-//                    phoneNum = saveInstance.get(key);
-            }
-//            if (arrOfStr[0].equals("RadioField")) {
-//                gender = saveInstance.get(key);
-//            }
-        }
-        SendMail sm = new SendMail(this, clientEmail, subject, fullName, companyName, this.fileImage);
-        sm.execute();
-    }
-
     private void rotateImageToUpright(Bitmap source) {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         float angle = ORIENTATIONS.get(rotation);
@@ -225,7 +203,6 @@ public class  MainActivity extends AppCompatActivity {
         matrix.postRotate(angle);
         Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
-
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -261,5 +238,52 @@ public class  MainActivity extends AppCompatActivity {
                 tiltTextView.setText("Angle:" + hashMap.get(key));
             }
         }
+    }
+
+    private void updateVisitorCardFields() {
+        ((EditText) findViewById(R.id.visitorName)).setText(((EditText) findViewById(R.id.fullNameText)).getText().toString());
+        ((TextView) findViewById(R.id.hostName)).setText(((EditText) findViewById(R.id.hostNameText)).getText().toString());
+        ((TextView) findViewById(R.id.companyName)).setText(((EditText) findViewById(R.id.companyNameText)).getText().toString());
+        Date validDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        ((TextView) findViewById(R.id.visitDate)).setText(formatter.format(validDate));
+    }
+
+    private void saveVisitorCard() {
+        View v1 = findViewById(R.id.visitorCard);
+        v1.setDrawingCacheEnabled(true);
+        v1.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+        v1.layout(0, 0, v1.getMeasuredWidth(), v1.getMeasuredHeight());
+        Bitmap testBitmap = Bitmap.createBitmap(v1.getDrawingCache());
+        v1.setDrawingCacheEnabled(false);
+        createVisitorCardFile(testBitmap);
+    }
+
+    private void createVisitorCardFile(Bitmap imageBitmap) {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] fileData = stream.toByteArray();
+            File path = new File(getApplicationContext().getFilesDir(), "Images");
+            if (!path.exists()) {
+                path.mkdirs();
+            }
+            visitorCardImageFile = new File(path, UUID.randomUUID().toString() + ".jpg");
+            Log.d("CREATED_FILE", "createFile: " + visitorCardImageFile.getPath());
+            FileOutputStream out = new FileOutputStream(visitorCardImageFile);
+            out.write(fileData);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendEmail() {
+        //Getting content for clientEmail
+        SendMail sm = new SendMail(this, ((EditText) findViewById(R.id.emailText)).getText().toString(), "Personal Information", visitorCardImageFile.getPath());
+        sm.execute();
     }
 }

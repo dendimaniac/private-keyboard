@@ -1,6 +1,5 @@
 package com.example.privatekeyboard.Helpers;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -25,32 +24,24 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public class SendMail extends AsyncTask<Void,Void,Void> {
-
+public class SendMail extends AsyncTask<Void, Void, Void> {
     //Declaring Variables
-
-    @SuppressLint("StaticFieldLeak")
     private final Context context;
 
     //Information to send email
     private final String email;
     private final String subject;
-    private final String fullName;
-    private final String companyName;
-    private String fileImage = null;
-
+    private final String fileImage;
 
     //Progressdialog to show while sending email
     private ProgressDialog progressDialog;
 
     //Class Constructor
-    public SendMail(Context context, String email, String subject, String fullName,String companyName, String file){
+    public SendMail(Context context, String email, String subject, String file) {
         //Initializing variables
         this.context = context;
         this.email = email;
         this.subject = subject;
-        this.fullName = fullName;
-        this.companyName = companyName;
         this.fileImage = file;
     }
 
@@ -58,7 +49,7 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
     protected void onPreExecute() {
         super.onPreExecute();
         //Showing progress dialog while sending email
-        progressDialog = ProgressDialog.show(context,"Sending message","Please wait...",false,false);
+        progressDialog = ProgressDialog.show(context, "Sending message", "Please wait...", false, false);
     }
 
     @Override
@@ -67,7 +58,7 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         //Dismissing the progress dialog
         progressDialog.dismiss();
         //Showing a success message
-        Toast.makeText(context,"Message Sent",Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Message Sent", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -75,8 +66,8 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         //Creating properties
         Properties props = new Properties();
 
-        //Configuring properties for Gmail
-        //If you are not using Gmail you may need to change the values
+        //Configuring properties for gmail
+        //If you are not using gmail you may need to change the values
 
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "465");
@@ -105,22 +96,21 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
             //Adding subject
             mm.setSubject(subject);
             //Adding message
+            //mm.setText(message);
             BodyPart messageBodyPart = new MimeBodyPart();
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
-            messageBodyPart.setText("Your information:" +
-                    "\nFirstname: " + fullName +
-                    "\nLastname: " + companyName);
+            messageBodyPart.setText("Your visitor card:");
             MimeBodyPart attachment = new MimeBodyPart();
-            if (fileImage != null){
-                String filename = fileImage;//change accordingly
-                DataSource source = new FileDataSource(filename);
+            if (fileImage != null) {
+                DataSource source = new FileDataSource(fileImage);
                 attachment.setDataHandler(new DataHandler(source));
                 attachment.setFileName("Profile");
                 multipart.addBodyPart(attachment);
             }
-            //Packed the message
+
             mm.setContent(multipart);
+
             //Sending email
             Transport.send(mm);
 

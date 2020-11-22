@@ -56,6 +56,8 @@ public class CustomCameraActivity extends AppCompatActivity {
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, -90);
@@ -123,18 +125,20 @@ public class CustomCameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera);
-        //Reopen connections for image handling
         hubConnection.on("takePicture", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("isTakingPicture", String.valueOf(message.value));
-            if (message.value.equals("retake")){
-                runOnUiThread (() -> btnRetake.callOnClick());
+            if (message.value.equals("retake")) {
+                runOnUiThread(() -> btnRetake.callOnClick());
             }
             if (message.value.equals("capture")) {
                 btnCapture.callOnClick();
             }
+            if (message.value.equals("confirm")) {
+                btnCapture.callOnClick();
+            }
             if (message.value.equals("cancel")) {
-                btnCancel.callOnClick();
+                finish();
             }
 
         }, TakingPicture.class);
@@ -205,11 +209,9 @@ public class CustomCameraActivity extends AppCompatActivity {
                             buffer.get(bytes);
                             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
                             Bitmap rotatedBitmap = rotateImageToUpright(bitmap);
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                            byte[] byteArray = stream.toByteArray();
-                            createFile(byteArray);
+                            createFile(rotatedBitmap);
                             Intent intent = new Intent(CustomCameraActivity.this, MainActivity.class);
+                            Log.d("isTaking", "RetakeFuckUp");
                             hubConnection.stop();
                             intent.putExtra("image_path", file.getPath());
                             startActivity(intent);
@@ -217,8 +219,11 @@ public class CustomCameraActivity extends AppCompatActivity {
                     }
                 }
 
-                private void createFile(byte[] fileData) {
+                private void createFile(Bitmap imageBitmap) {
                     try {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] fileData = stream.toByteArray();
                         File path = new File(getApplicationContext().getFilesDir(), "Images");
                         if (!path.exists()) {
                             path.mkdirs();
