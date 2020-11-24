@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
-        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+        String functionUrl = "http://192.168.1.104:7071/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -144,12 +144,15 @@ public class MainActivity extends AppCompatActivity {
             saveInstance.put("TextViewField-Tilt", message.value.toString());
         }, TiltAngle.class);
 
-        hubConnection.on("takePicture", (message) -> {
+        hubConnection.on("pressButton", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-            Log.d("isTakingPicture", String.valueOf(message.value));
+            Log.d("pressButton", String.valueOf(message.value));
             if (message.value.equals("on")) {
                 openCustomCameraButton.callOnClick();
                 hubConnection.stop();
+            }else if (message.value.equals("sendEmail")) {
+                Log.d("call", "calllled");
+                runOnUiThread(() -> sendEmailButton.callOnClick());
             }
         }, TakingPicture.class);
 

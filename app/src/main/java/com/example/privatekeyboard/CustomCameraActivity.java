@@ -126,9 +126,9 @@ public class CustomCameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_camera);
-        hubConnection.on("takePicture", (message) -> {
+        hubConnection.on("pressButton", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-            Log.d("isTakingPicture", String.valueOf(message.value));
+            Log.d("pressButton", String.valueOf(message.value));
             if (message.value.equals("retake")) {
                 runOnUiThread(() -> btnRetake.callOnClick());
             }

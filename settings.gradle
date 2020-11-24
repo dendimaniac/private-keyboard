@@ -1,3 +1,6 @@
+include ':activation'
+include ':mail'
+include ':additionnal'
 include ':commons-codec-1.9'
 include ':app'
 rootProject.name = "PrivateKeyboard"
