@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         if (!saveInstance.isEmpty()) {
             getInstance(saveInstance);
         }
-        String functionUrl = "http://192.168.1.104:7071/api";
+        String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
         HubConnection hubConnection = HubConnectionBuilder.create(functionUrl).build();
 
         hubConnection.on("sendInputField", (message) -> {
@@ -139,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("TiltAngle", String.valueOf(message.value));
+            saveInstance.put("TextViewField-Tilt", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
             runOnUiThread(() -> tiltTextView.setText("Angle:" + message.value));
-            saveInstance.put("TextViewField-Tilt", message.value.toString());
         }, TiltAngle.class);
 
         hubConnection.on("pressButton", (message) -> {
@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
         Set<String> keySet = hashMap.keySet();
         for (String key : keySet) {
             String[] arrOfStr = key.split("-", 3);
+            Log.d("Instance",hashMap.get(key));
 
             if (arrOfStr[0].equals("InputField")) {
                 LinearLayout inputField = (LinearLayout) linearLayout.getChildAt(Integer.parseInt(arrOfStr[1]));

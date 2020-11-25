@@ -148,6 +148,7 @@ public class CustomCameraActivity extends AppCompatActivity {
         textureView.setSurfaceTextureListener(textureListener);
         btnCapture = findViewById(R.id.btnCapture);
         btnCapture.setOnClickListener(view -> {
+            btnRetake.setVisibility(View.VISIBLE);
             ViewGroup.LayoutParams params = btnCapture.getLayoutParams();
             params.width = 330;
             btnCapture.setLayoutParams(params);
@@ -156,6 +157,10 @@ public class CustomCameraActivity extends AppCompatActivity {
         });
         btnRetake = findViewById(R.id.btnRetake);
         btnRetake.setOnClickListener(view -> {
+            btnRetake.setVisibility(View.INVISIBLE);
+            ViewGroup.LayoutParams params = btnCapture.getLayoutParams();
+            params.width = -1;
+            btnCapture.setLayoutParams(params);
             isCapturing = true;
             createCameraPreview();
         });
