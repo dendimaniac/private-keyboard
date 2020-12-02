@@ -18,7 +18,6 @@
         android:background="#FFFFFF"
         android:elevation="8dp"
         android:orientation="vertical"
-        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -155,6 +154,7 @@
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -165,6 +165,7 @@
             android:layout_height="323dp"
             android:orientation="vertical"
             android:padding="32dp">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -253,28 +254,28 @@
             </LinearLayout>
 
             <!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:tag="wVisible">-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:orientation="horizontal"-->
+            <!--                android:tag="wVisible">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView3"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="@string/phone_number" />-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/textView3"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:text="@string/phone_number" />-->
 
-<!--                <EditText-->
-<!--                    android:id="@+id/editTextTextPersonName3"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:autofillHints="@string/phone_number"-->
-<!--                    android:ems="10"-->
-<!--                    android:hint="@string/phone_number"-->
-<!--                    android:inputType="phone" />-->
-<!--            </LinearLayout>-->
+            <!--                <EditText-->
+            <!--                    android:id="@+id/editTextTextPersonName3"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_weight="1"-->
+            <!--                    android:autofillHints="@string/phone_number"-->
+            <!--                    android:ems="10"-->
+            <!--                    android:hint="@string/phone_number"-->
+            <!--                    android:inputType="phone" />-->
+            <!--            </LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -300,39 +301,39 @@
                     android:inputType="textEmailAddress" />
             </LinearLayout>
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:orientation="vertical"-->
-<!--                android:tag="wVisible">-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:orientation="vertical"-->
+            <!--                android:tag="wVisible">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView5"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="@string/gender" />-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/textView5"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="@string/gender" />-->
 
-<!--&lt;!&ndash;                <RadioGroup&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/radioSex"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:tag="sex">&ndash;&gt;-->
+            <!--&lt;!&ndash;                <RadioGroup&ndash;&gt;-->
+            <!--&lt;!&ndash;                    android:id="@+id/radioSex"&ndash;&gt;-->
+            <!--&lt;!&ndash;                    android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                    android:tag="sex">&ndash;&gt;-->
 
-<!--&lt;!&ndash;                    <RadioButton&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:id="@+id/radioMale"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:layout_width="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:text="@string/radio_male" />&ndash;&gt;-->
+            <!--&lt;!&ndash;                    <RadioButton&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:id="@+id/radioMale"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:text="@string/radio_male" />&ndash;&gt;-->
 
-<!--&lt;!&ndash;                    <RadioButton&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:id="@+id/radioFemale"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:layout_width="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                        android:text="@string/radio_female" />&ndash;&gt;-->
+            <!--&lt;!&ndash;                    <RadioButton&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:id="@+id/radioFemale"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;                        android:text="@string/radio_female" />&ndash;&gt;-->
 
-<!--&lt;!&ndash;                </RadioGroup>&ndash;&gt;-->
+            <!--&lt;!&ndash;                </RadioGroup>&ndash;&gt;-->
 
-<!--            </LinearLayout>-->
+            <!--            </LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -375,6 +376,49 @@
                     android:text="@string/take_picture" />
             </LinearLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/takenImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="75dp"
+                    android:layout_marginBottom="75dp"
+                    android:background="@drawable/hiiii"
+                    android:scaleType="fitXY"
+                    android:scaleX="0.35"
+                    android:scaleY="0.35"
+                    app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <Button
+                    android:id="@+id/sendEmailButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send form"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/qrImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="75dp"
+                    android:layout_marginBottom="75dp"
+                    android:contentDescription="@string/qr_code"
+                    app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
     </ScrollView>
 
@@ -389,41 +433,5 @@
     <!--        app:layout_constraintStart_toStartOf="parent"-->
     <!--        app:srcCompat="@drawable/hiiii"-->
     <!--        android:scaleType="fitXY"/>-->
-
-    <ImageView
-        android:id="@+id/takenImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:background="@drawable/hiiii"
-        android:scaleType="fitXY"
-        android:scaleX="0.35"
-        android:scaleY="0.35"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/qrImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:contentDescription="@string/qr_code"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <Button
-        android:id="@+id/sendEmailButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send form"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

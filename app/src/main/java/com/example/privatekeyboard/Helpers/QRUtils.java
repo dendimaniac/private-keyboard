@@ -41,7 +41,7 @@ public class QRUtils {
 
     private static String GenerateQRQuery(LinearLayout layout) {
         StringBuilder query = new StringBuilder("[");
-        for (int i = 0; i < layout.getChildCount(); i++) {
+        for (int i = 0; i < layout.getChildCount()-1; i++) {
             LinearLayout fieldLayout = (LinearLayout) layout.getChildAt(i);
             String fieldTag = (String) layout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {

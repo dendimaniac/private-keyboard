@@ -237,7 +237,8 @@ public class MainActivity extends AppCompatActivity {
 //                        radio.check(R.id.radioFemale);
 //                        break;
 //                }
-            }*/ else {
+            }*/
+            if (arrOfStr[0].equals("TextViewField")){
                 TextView tiltTextView = findViewById(R.id.tiltValue);
                 tiltTextView.setText("Angle:" + hashMap.get(key));
             }
