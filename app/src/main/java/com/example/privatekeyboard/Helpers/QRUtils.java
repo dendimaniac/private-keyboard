@@ -30,7 +30,7 @@ public class QRUtils {
         Log.d("NewUUID", newUuid);
         String settings = GenerateQRQuery(formLinearLayout);
         Log.d("InputSettings", settings);
-        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 450);
+        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 1000);
         try {
             Bitmap bitmap = qrgEncoder.encodeAsBitmap();
             qrImage.setImageBitmap(bitmap);
