@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("TiltAngle", String.valueOf(message.value));
-            saveInstance.put("TextViewField-Tilt", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
             runOnUiThread(() -> tiltTextView.setText("Angle:" + message.value));
         }, TiltAngle.class);
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("pressButton", String.valueOf(message.value));
             if (message.value.equals("on")) {
-                openCustomCameraButton.callOnClick();
+                runOnUiThread(() -> openCustomCameraButton.callOnClick())   ;
                 hubConnection.stop();
             }else if (message.value.equals("sendEmail")) {
                 Log.d("call", "calllled");
@@ -180,8 +179,10 @@ public class MainActivity extends AppCompatActivity {
     private void saveInstance() {
 //        saveInstance.put("RadioField-Sex", "No Response");
         saveInstance.clear();
+        TextView tiltTextView = findViewById(R.id.tiltValue);
+        saveInstance.put("TextViewField-Tilt", String.valueOf(tiltTextView.getText()));
 
-        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+        for (int i = 0; i < linearLayout.getChildCount() -1 ; i++) {
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 //                }
             }*/ else {
                 TextView tiltTextView = findViewById(R.id.tiltValue);
-                tiltTextView.setText("Angle:" + hashMap.get(key));
+                tiltTextView.setText(hashMap.get(key));
             }
         }
     }

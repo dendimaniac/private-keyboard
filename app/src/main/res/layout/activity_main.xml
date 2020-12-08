@@ -375,7 +375,48 @@
                     android:text="@string/take_picture" />
             </LinearLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/takenImage"
+                    android:layout_width="192dp"
+                    android:layout_height="256dp"
+                    android:background="@drawable/hiiii"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <ImageView
+                    android:id="@+id/qrImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:contentDescription="@string/qr_code"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <Button
+                    android:id="@+id/sendEmailButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send form"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
+
     </ScrollView>
 
     <!--    <ImageButton-->
@@ -389,41 +430,5 @@
     <!--        app:layout_constraintStart_toStartOf="parent"-->
     <!--        app:srcCompat="@drawable/hiiii"-->
     <!--        android:scaleType="fitXY"/>-->
-
-    <ImageView
-        android:id="@+id/takenImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:background="@drawable/hiiii"
-        android:scaleType="fitXY"
-        android:scaleX="0.35"
-        android:scaleY="0.35"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/qrImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:contentDescription="@string/qr_code"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <Button
-        android:id="@+id/sendEmailButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send form"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
