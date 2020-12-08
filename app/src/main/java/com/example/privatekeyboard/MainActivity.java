@@ -147,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
             Log.d("pressButton", String.valueOf(message.value));
             if (message.value.equals("on")) {
+                runOnUiThread(() -> openCustomCameraButton.callOnClick())   ;
                 hubConnection.stop();
-                runOnUiThread(() -> openCustomCameraButton.callOnClick());
             }else if (message.value.equals("sendEmail")) {
                 Log.d("call", "calllled");
                 runOnUiThread(() -> sendEmailButton.callOnClick());
@@ -179,8 +179,10 @@ public class MainActivity extends AppCompatActivity {
     private void saveInstance() {
 //        saveInstance.put("RadioField-Sex", "No Response");
         saveInstance.clear();
-        saveInstance.put("TextViewField-Tilt", (findViewById(R.id.tiltValue).toString()));
-        for (int i = 0; i < linearLayout.getChildCount()-1; i++) {
+        TextView tiltTextView = findViewById(R.id.tiltValue);
+        saveInstance.put("TextViewField-Tilt", String.valueOf(tiltTextView.getText()));
+
+        for (int i = 0; i < linearLayout.getChildCount() -1 ; i++) {
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {
@@ -236,10 +238,9 @@ public class MainActivity extends AppCompatActivity {
 //                        radio.check(R.id.radioFemale);
 //                        break;
 //                }
-            }*/
-            if (arrOfStr[0].equals("TextViewField")){
+            }*/ else {
                 TextView tiltTextView = findViewById(R.id.tiltValue);
-                tiltTextView.setText("Angle:" + hashMap.get(key));
+                tiltTextView.setText(hashMap.get(key));
             }
         }
     }
