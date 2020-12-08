@@ -136,6 +136,7 @@ public class CustomCameraActivity extends AppCompatActivity {
                 runOnUiThread(() -> btnCapture.callOnClick());
             }
             if (message.value.equals("cancel")) {
+                hubConnection.stop();
                 finish();
             }
 
