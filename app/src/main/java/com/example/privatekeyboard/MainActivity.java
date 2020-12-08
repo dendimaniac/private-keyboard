@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             if (message.value.equals("on")) {
                 runOnUiThread(() -> openCustomCameraButton.callOnClick())   ;
                 hubConnection.stop();
+                runOnUiThread(() -> openCustomCameraButton.callOnClick());
             }else if (message.value.equals("sendEmail")) {
                 Log.d("call", "calllled");
                 runOnUiThread(() -> sendEmailButton.callOnClick());
@@ -183,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         saveInstance.put("TextViewField-Tilt", String.valueOf(tiltTextView.getText()));
 
         for (int i = 0; i < linearLayout.getChildCount() -1 ; i++) {
+
             LinearLayout fieldLayout = (LinearLayout) linearLayout.getChildAt(i);
             String fieldTag = (String) linearLayout.getChildAt(i).getTag();
             if (!fieldTag.equals("hidden")) {
@@ -238,7 +240,8 @@ public class MainActivity extends AppCompatActivity {
 //                        radio.check(R.id.radioFemale);
 //                        break;
 //                }
-            }*/ else {
+            }*/
+            if (arrOfStr[0].equals("TextViewField")){
                 TextView tiltTextView = findViewById(R.id.tiltValue);
                 tiltTextView.setText(hashMap.get(key));
             }
