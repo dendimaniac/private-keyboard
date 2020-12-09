@@ -1,12 +1,12 @@
 # Private Keyboard
 
 ## Description
-The Private keyboard project will develop a user interface with what one can use a personal phone as keyboard for the device
+The Private keyboard project will develop a user interface with what one can use a personal phone as a keyboard for the device
 
 ## Features
 * Taking the picture
 * Send information to email as a visitor card
-* Let user control the application by scaning the QR code inside app
+* Let the user control the application by scanning the QR code inside app
 
 ## Prerequisites
 * An azure function using signalR service. See [project](https://github.com/private-keyboard-metropolia/private-keyboard-azure-functions)
