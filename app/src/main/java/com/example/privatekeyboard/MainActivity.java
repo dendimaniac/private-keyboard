@@ -1,5 +1,12 @@
 package com.example.privatekeyboard;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -10,15 +17,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
-import android.view.View;
 import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +39,7 @@ import com.example.privatekeyboard.Helpers.QRUtils;
 import com.example.privatekeyboard.Helpers.SendMail;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
+import com.example.privatekeyboard.Data.TiltAngle;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private final String functionUrl = "https://privatekeyboard.azurewebsites.net/api";
+    private final String functionUrl = "http://192.168.1.94:7071/api";
     private LinearLayout linearLayout;
     private ImageView profileImageView;
     // Deployment function URL: https://privatekeyboard.azurewebsites.net/api
@@ -86,12 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Button sendEmailButton = findViewById(R.id.sendEmailButton);
         Button openCustomCameraButton = findViewById(R.id.buttonCam);
-
-        sendEmailButton.setOnClickListener(view -> {
-            sendEmail();
-        });
 
         openCustomCameraButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CustomCameraActivity.class);
@@ -119,10 +123,10 @@ public class MainActivity extends AppCompatActivity {
 
         hubConnection.on("updateTiltAngle", (message) -> {
             if (!message.sender.equals(QRUtils.connectedUuid)) return;
-
+          
             Log.d("TiltAngle", String.valueOf(message.value));
             TextView tiltTextView = findViewById(R.id.tiltValue);
-            tiltTextView.setText("Angle:" + message.value);
+            tiltTextView.setText("Angle:" + String.valueOf(message.value));
         }, TiltAngle.class);
 
         hubConnection.on("confirmQRScan", (message) -> {
@@ -141,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendEmail() {
         //Getting content for email
-        String email = ((EditText) findViewById(R.id.editTextEmail)).getText().toString().trim();
+        String email = editTextEmail.getText().toString().trim();
         String subject = "Personal Information";
         String message = "Hiiiiiiiiiiiii";
 
@@ -151,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         //Executing sendmail to send email
         sm.execute();
     }
-
+  
     private void rotateImageToUpright(Bitmap source) {
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         float angle = ORIENTATIONS.get(rotation);
