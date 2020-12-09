@@ -1,6 +1,6 @@
 package com.example.privatekeyboard.Data;
 
-public class TiltAngle {
+public class TakingPicture {
     public String sender;
-    public Integer value;
+    public String value;
 }

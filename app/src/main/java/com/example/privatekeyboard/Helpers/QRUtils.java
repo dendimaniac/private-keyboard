@@ -18,8 +18,9 @@ import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 
 public class QRUtils {
-    public static String connectedUuid;
-    public static String newUuid;
+
+    public static String connectedUuid = null;
+    public static String newUuid = null;
     private static final String baseWebAppUrl = "https://lively-stone-01c8fc003.azurestaticapps.net/";
     // Deployment web app URL: https://lively-stone-01c8fc003.azurestaticapps.net/
     // Development web app URL (example): http://192.168.1.149:3000/
@@ -29,7 +30,7 @@ public class QRUtils {
         Log.d("NewUUID", newUuid);
         String settings = GenerateQRQuery(formLinearLayout);
         Log.d("InputSettings", settings);
-        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 800);
+        QRGEncoder qrgEncoder = new QRGEncoder(baseWebAppUrl + "?settings=" + settings + "&uuid=" + newUuid, null, QRGContents.Type.TEXT, 550);
         try {
             Bitmap bitmap = qrgEncoder.encodeAsBitmap();
             qrImage.setImageBitmap(bitmap);
@@ -40,21 +41,28 @@ public class QRUtils {
 
     private static String GenerateQRQuery(LinearLayout layout) {
         StringBuilder query = new StringBuilder("[");
-        for (int i = 0; i < layout.getChildCount(); i++) {
-            query.append("{");
+        for (int i = 0; i < layout.getChildCount() -1; i++) {
             LinearLayout fieldLayout = (LinearLayout) layout.getChildAt(i);
+            String fieldTag = (String) layout.getChildAt(i).getTag();
+            if (!fieldTag.equals("hidden")) {
 
-            if (fieldLayout.getChildAt(1) instanceof EditText) {
-                AddTextFieldJsonSetting(fieldLayout, query);
-            } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
-                AddRadioGroupJsonSetting(fieldLayout, query);
+                query.append("{");
+                query.append("\"position\":\"").append(i).append("\",");
+                if (fieldLayout.getChildAt(1) instanceof EditText) {
+                    AddTextFieldJsonSetting(fieldLayout, query);
+                } else if (fieldLayout.getChildAt(1) instanceof RadioGroup) {
+                    AddRadioGroupJsonSetting(fieldLayout, query);
+                }
+
+                query.append("}");
+
+                if (i < layout.getChildCount() - 1) {
+                    query.append(",");
+                }
             }
-
-            query.append("}");
-
-            if (i < layout.getChildCount() - 1) {
-                query.append(",");
-            }
+        }
+        if (query.length() > 0) {
+            query.deleteCharAt(query.length() - 1);
         }
         query.append("]");
         Log.d("QUERY", query.toString());
