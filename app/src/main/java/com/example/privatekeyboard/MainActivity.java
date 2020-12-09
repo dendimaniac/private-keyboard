@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         QRUtils.SetNewQRBitmap(findViewById(R.id.qrImage), linearLayout);
         if (QRUtils.connectedUuid != null) {
             qrImage.setVisibility(View.INVISIBLE);
-
+            profileImageView.setVisibility(View.VISIBLE);
         }
     }
 
