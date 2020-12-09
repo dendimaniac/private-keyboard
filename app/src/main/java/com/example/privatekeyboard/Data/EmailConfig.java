@@ -7,4 +7,5 @@ public class EmailConfig {
     public static final String PASSWORD ="omrsbmkzmpaxwscd";
     public static HashMap<String,String> saveInstance = new HashMap<>();
     //hi
+    //hello
 }
