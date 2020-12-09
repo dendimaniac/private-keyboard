@@ -18,7 +18,6 @@
         android:background="#FFFFFF"
         android:elevation="8dp"
         android:orientation="vertical"
-        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -155,9 +154,11 @@
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
 
         <LinearLayout
             android:id="@+id/input_layout"
@@ -188,7 +189,7 @@
 
                 <TextView
                     android:id="@+id/textView"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/first_name" />
@@ -212,7 +213,7 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/last_name" />
@@ -236,10 +237,10 @@
 
                 <TextView
                     android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Host name" />
+                    android:text="@string/host_name" />
 
                 <EditText
                     android:id="@+id/hostNameText"
@@ -248,7 +249,7 @@
                     android:layout_weight="1"
                     android:autofillHints="@string/last_name"
                     android:ems="10"
-                    android:hint="Host name"
+                    android:hint="@string/host_name"
                     android:inputType="textPersonName" />
             </LinearLayout>
 
@@ -284,7 +285,7 @@
 
                 <TextView
                     android:id="@+id/textView4"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/email_address" />
@@ -346,8 +347,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_marginBottom="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/tilt_adjustment" />
+                    android:layout_weight="1" />
 
 
                 <TextView
@@ -384,6 +384,7 @@
                     android:layout_width="192dp"
                     android:layout_height="256dp"
                     android:background="@drawable/hiiii"
+                    android:contentDescription="@string/imgcontent"
                     android:visibility="visible"
                     app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -396,7 +397,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="35dp"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="35dp"
                     android:contentDescription="@string/qr_code"
                     android:visibility="visible"
                     app:layout_constraintBottom_toTopOf="@+id/sendEmailButton"
@@ -409,7 +410,7 @@
                     android:id="@+id/sendEmailButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Send form"
+                    android:text="@string/sendform"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
