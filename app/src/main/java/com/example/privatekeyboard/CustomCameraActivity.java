@@ -67,7 +67,6 @@ public class CustomCameraActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
     private Button btnCapture;
     private Button btnRetake;
     private TextureView textureView;
