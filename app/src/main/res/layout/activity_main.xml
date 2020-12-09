@@ -49,27 +49,24 @@
                     android:id="@+id/textView8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Name:" />
+                    android:text="@string/first_name" />
 
                 <TextView
                     android:id="@+id/visitorName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:text="Name" />
+                    android:ems="10" />
 
                 <TextView
                     android:id="@+id/textView9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Valid thru:" />
+                    android:text="@string/Valid" />
 
                 <TextView
                     android:id="@+id/visitDate"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="22/11/2020" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </LinearLayout>
@@ -80,7 +77,7 @@
             android:layout_height="50sp"
             android:background="#2196F3"
             android:gravity="center"
-            android:text="VISITOR"
+            android:text="@string/visitor"
             android:textAlignment="center"
             android:textAllCaps="true"
             android:textColor="#FFFFFF"
@@ -118,14 +115,13 @@
                         android:id="@+id/companyName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="LEVITEZER"
                         android:textAllCaps="true" />
 
                     <TextView
                         android:id="@+id/textView14"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Smooths the movement" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="@string/slogan" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -139,14 +135,12 @@
                 <TextView
                     android:id="@+id/textView15"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Host:" />
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/hostName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Kim Janson" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -155,6 +149,7 @@
         android:id="@+id/scrollView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

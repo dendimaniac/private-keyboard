@@ -257,8 +257,8 @@ public class MainActivity extends AppCompatActivity {
     private void saveVisitorCard() {
         View v1 = findViewById(R.id.visitorCard);
         v1.setDrawingCacheEnabled(true);
-        v1.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        v1.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.getSize(1)),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.getSize(1)));
 
         v1.layout(0, 0, v1.getMeasuredWidth(), v1.getMeasuredHeight());
         Bitmap testBitmap = Bitmap.createBitmap(v1.getDrawingCache());

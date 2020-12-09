@@ -161,6 +161,7 @@ public class CustomCameraActivity extends AppCompatActivity {
             ViewGroup.LayoutParams params = btnCapture.getLayoutParams();
             params.width = -1;
             btnCapture.setLayoutParams(params);
+            btnCapture.setText("Capture");
             isCapturing = true;
             createCameraPreview();
         });

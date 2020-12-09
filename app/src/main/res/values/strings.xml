@@ -14,5 +14,9 @@
     <string name="host_name">Host name</string>
     <string name="imgcontent">Taken Image</string>
     <string name="sendform">Send form</string>
+    <string name="visitor">VISITOR</string>
+    <string name="slogan">Virtual Touch</string>
+    <string name="host">Host</string>
+    <string name="Valid">Valid through:</string>
     <string name="inform">Allow only ONE connection at a time </string>
 </resources>
